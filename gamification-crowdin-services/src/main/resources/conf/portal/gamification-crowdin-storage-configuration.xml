@@ -1,0 +1,49 @@
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+               xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+
+
+    <component>
+        <type>io.meeds.gamification.crowdin.storage.WebHookStorage</type>
+    </component>
+
+    <component>
+        <type>io.meeds.gamification.crowdin.dao.WebHookDAO</type>
+    </component>
+
+    <component>
+        <type>io.meeds.gamification.crowdin.storage.CrowdinConsumerStorage</type>
+    </component>
+
+<!--    <component>-->
+<!--        <key>io.meeds.gamification.crowdin.storage.CrowdinConsumerStorage</key>-->
+<!--        <type>io.meeds.gamification.crowdin.storage.cached.CrowdinConsumerCachedStorage</type>-->
+<!--    </component>-->
+
+
+    <component>
+        <key>io.meeds.gamification.crowdin.services.CrowdinConsumerService</key>
+        <type>io.meeds.gamification.crowdin.services.impl.CrowdinConsumerServiceImpl</type>
+    </component>
+
+    <component>
+        <key>io.meeds.gamification.crowdin.services.WebhookService</key>
+        <type>io.meeds.gamification.crowdin.services.impl.WebhookServiceImpl</type>
+    </component>
+
+    <external-component-plugins>
+        <target-component>org.exoplatform.commons.api.persistence.DataInitializer</target-component>
+        <component-plugin>
+            <name>GamificationChangeLogsPlugin</name>
+            <set-method>addChangeLogsPlugin</set-method>
+            <type>org.exoplatform.commons.persistence.impl.ChangeLogsPlugin</type>
+            <init-params>
+                <values-param>
+                    <name>changelogs</name>
+                    <description>Change logs of Crowdin Connector</description>
+                    <value>db/changelog/crowdin-connector.db.changelog-1.0.0.xml</value>
+                </values-param>
+            </init-params>
+        </component-plugin>
+    </external-component-plugins>
+</configuration>

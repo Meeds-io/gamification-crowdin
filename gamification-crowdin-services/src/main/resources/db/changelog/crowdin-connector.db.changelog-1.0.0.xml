@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+  This file is part of the Meeds project (https://meeds.io/).
+  Copyright (C) 2022 Meeds Association contact@meeds.io
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 3 of the License, or (at your option) any later version.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+  You should have received a copy of the GNU Lesser General Public License
+  along with this program; if not, write to the Free Software Foundation,
+  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+-->
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <property name="autoIncrement" value="true" dbms="mysql,mssql,h2,sybase,db2,hsqldb"/>
+    <property name="autoIncrement" value="false" dbms="oracle,postgresql"/>
+
+    
+    <changeSet author="meeds-crowdin-connector" id="1.0.0-1">
+        <createTable tableName="CROWDIN_WEBHOOKS">
+          <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
+            <constraints nullable="false" primaryKey="true" primaryKeyName="PK_CROWDIN_WEBHOOKS"/>
+          </column>
+          <column name="WEBHOOK_ID" type="BIGINT">
+            <constraints nullable="false"/>
+          </column>
+          <column name="PROJECT_ID" type="BIGINT">
+            <constraints nullable="false"/>
+          </column>
+          <column name="PROJECT_NAME" type="NVARCHAR(250)">
+            <constraints nullable="false"/>
+          </column>
+          <column name="TRIGGERS" type="NVARCHAR(2000)">
+            <constraints nullable="false"/>
+          </column>
+          <column name="ENABLED" type="BOOLEAN">
+            <constraints nullable="false"/>
+          </column>
+          <column name="WATCHED_BY" type="BIGINT">
+            <constraints nullable="false"/>
+          </column>
+          <column name="WATCHED_DATE" type="DATE">
+            <constraints nullable="false"/>
+          </column>
+          <column name="UPDATED_DATE" type="DATE">
+            <constraints nullable="false"/>
+          </column>
+          <column name="REFRESH_DATE" type="DATE">
+            <constraints nullable="false"/>
+          </column>
+          <column name="SECRET" type="NVARCHAR(250)">
+            <constraints nullable="false"/>
+          </column>
+          <column name="TOKEN" type="NVARCHAR(250)">
+            <constraints nullable="false"/>
+          </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="meeds-crowdin-connector" id="1.0.0-2" dbms="oracle,postgresql,hsqldb" onValidationFail="MARK_RAN" failOnError="false">
+        <validCheckSum>ANY</validCheckSum>
+        <preConditions>
+          <not>
+            <sequenceExists sequenceName="SEQ_CROWDIN_WEBHOOKS_ID" />
+          </not>
+        </preConditions>
+        <createSequence sequenceName="SEQ_CROWDIN_WEBHOOKS_ID" startValue="1"/>
+    </changeSet>
+</databaseChangeLog>
+
+
