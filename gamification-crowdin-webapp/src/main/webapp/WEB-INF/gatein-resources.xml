@@ -3,7 +3,7 @@
 
   This file is part of the Meeds project (https://meeds.io/).
 
-  Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+  Copyright (C) 2023 Meeds Lab contact@meedslab.com
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -22,6 +22,73 @@
 <gatein-resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://www.exoplatform.org/xml/ns/gatein_resources_1_4 http://www.exoplatform.org/xml/ns/gatein_resources_1_4"
                   xmlns="http://www.exoplatform.org/xml/ns/gatein_resources_1_4">
+
+
+    <module>
+        <name>gamificationUserConnectorsExtensionsCrowdin</name>
+        <load-group>gamification-user-connectors</load-group>
+        <script>
+            <path>/js/crowdinUserConnectorExtension.bundle.js</path>
+        </script>
+        <depends>
+            <module>vue</module>
+        </depends>
+        <depends>
+            <module>vuetify</module>
+        </depends>
+        <depends>
+            <module>eXoVueI18n</module>
+        </depends>
+        <depends>
+            <module>extensionRegistry</module>
+        </depends>
+        <depends>
+            <module>commonVueComponents</module>
+        </depends>
+    </module>
+
+    <module>
+        <name>gamificationAdminConnectorsExtensionsCrowdin</name>
+        <load-group>gamification-admin-connectors</load-group>
+        <script>
+            <path>/js/crowdinAdminConnectorExtension.bundle.js</path>
+        </script>
+        <depends>
+            <module>vue</module>
+        </depends>
+        <depends>
+            <module>vuetify</module>
+        </depends>
+        <depends>
+            <module>eXoVueI18n</module>
+        </depends>
+        <depends>
+            <module>extensionRegistry</module>
+        </depends>
+        <depends>
+            <module>commonVueComponents</module>
+        </depends>
+    </module>
+
+    <module>
+        <name>engagementCenterConnectorsCrowdinExtensions</name>
+        <load-group>engagement-center-connector-extensions</load-group>
+        <script>
+            <path>/js/connectorExtensions.bundle.js</path>
+        </script>
+        <depends>
+            <module>vue</module>
+        </depends>
+        <depends>
+            <module>vuetify</module>
+        </depends>
+        <depends>
+            <module>eXoVueI18n</module>
+        </depends>
+        <depends>
+            <module>extensionRegistry</module>
+        </depends>
+    </module>
 
 </gatein-resources>
 

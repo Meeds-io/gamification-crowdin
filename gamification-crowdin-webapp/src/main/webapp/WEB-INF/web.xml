@@ -3,7 +3,7 @@
 
   This file is part of the Meeds project (https://meeds.io/).
 
-  Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+  Copyright (C) 2023 Meeds Lab contact@meedslab.com
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 
-  <display-name>gamification-evm</display-name>
+  <display-name>gamification-crowdin</display-name>
   <absolute-ordering/>
 
   <listener>
