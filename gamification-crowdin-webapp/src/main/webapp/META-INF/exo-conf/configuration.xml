@@ -3,7 +3,7 @@
 
   This file is part of the Meeds project (https://meeds.io/).
 
-  Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+  Copyright (C) 2023 Meeds Lab contact@meedslab.com
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@
         </value-param>
         <values-param>
           <name>add.profiles</name>
-          <value>gamification-evm</value>
+          <value>gamification-crowdin</value>
         </values-param>
         <object-param>
           <name>change</name>
@@ -49,7 +49,7 @@
             <field name="dependencies">
               <collection type="java.util.ArrayList">
                 <value>
-                  <string>gamification-evm</string>
+                  <string>gamification-crowdin</string>
                 </value>
               </collection>
             </field>
