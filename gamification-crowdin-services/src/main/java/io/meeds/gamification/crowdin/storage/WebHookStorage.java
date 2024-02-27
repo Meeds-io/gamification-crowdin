@@ -21,15 +21,18 @@ import io.meeds.gamification.crowdin.dao.WebHookDAO;
 import io.meeds.gamification.crowdin.entity.WebhookEntity;
 import io.meeds.gamification.crowdin.model.WebHook;
 import org.exoplatform.commons.ObjectAlreadyExistsException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
 
 import static io.meeds.gamification.crowdin.storage.mapper.WebHookMapper.fromEntity;
 import static io.meeds.gamification.crowdin.storage.mapper.WebHookMapper.toEntity;
-
+@Component
 public class WebHookStorage {
 
+  @Autowired
   private final WebHookDAO webHookDAO;
 
   public WebHookStorage(WebHookDAO crowdinHookDAO) {

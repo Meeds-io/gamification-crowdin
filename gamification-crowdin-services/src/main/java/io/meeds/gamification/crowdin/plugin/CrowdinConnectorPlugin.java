@@ -30,6 +30,7 @@ import io.meeds.oauth.exception.OAuthExceptionCode;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,6 +39,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
+@Service
 public class CrowdinConnectorPlugin extends ConnectorPlugin {
 
   private static final Log LOG                = ExoLogger.getLogger(CrowdinConnectorPlugin.class);
@@ -52,7 +54,7 @@ public class CrowdinConnectorPlugin extends ConnectorPlugin {
 
   private long                          remoteConnectorId;
 
-  private final ConnectorSettingService connectorSettingService;
+  private ConnectorSettingService connectorSettingService;
 
   public CrowdinConnectorPlugin(ConnectorSettingService connectorSettingsService) {
     this.connectorSettingService = connectorSettingsService;

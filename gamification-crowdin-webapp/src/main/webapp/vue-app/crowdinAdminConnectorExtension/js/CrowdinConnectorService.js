@@ -16,7 +16,7 @@
  */
 
 export function getProjects(accessToken) {
-  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/gamification/connectors/crowdin/hooks/get-projects?accessToken=${accessToken}`, {
+  return fetch(`/gamification-crowdin/rest/crowdin/hooks/get-projects?accessToken=${accessToken}`, {
     method: 'GET',
     credentials: 'include',
   }).then((resp) => {
@@ -34,7 +34,7 @@ export function getProjects(accessToken) {
 }
 
 export function getCrowdinWebHooks(offset, limit) {
-  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/gamification/connectors/crowdin/hooks?offset=${offset || 0}&limit=${limit|| 10}&returnSize=true`, {
+  return fetch(`/gamification-crowdin/rest/crowdin/hooks?offset=${offset || 0}&limit=${limit|| 10}&returnSize=true`, {
     method: 'GET',
     credentials: 'include',
   }).then((resp) => {
@@ -47,7 +47,7 @@ export function getCrowdinWebHooks(offset, limit) {
 }
 
 export function getCrowdinWebHookById(hookId) {
-  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/gamification/connectors/crowdin/hooks/${hookId}`, {
+  return fetch(`/gamification-crowdin/rest/crowdin/hooks/${hookId}`, {
     method: 'GET',
     credentials: 'include',
   }).then((resp) => {
@@ -65,7 +65,7 @@ export function saveCrowdinWebHook(project, accessToken) {
   formData.append('projectName', project.name);
   formData.append('projectLogo', project.logo);
   formData.append('accessToken', accessToken);
-  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/gamification/connectors/crowdin/hooks`, {
+  return fetch('/gamification-crowdin/rest/crowdin/hooks', {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -89,7 +89,7 @@ export function updateWebHookAccessToken(webHookId, accessToken) {
   const formData = new FormData();
   formData.append('webHookId', webHookId);
   formData.append('accessToken', accessToken);
-  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/gamification/connectors/crowdin/hooks`, {
+  return fetch('/gamification-crowdin/rest/crowdin/hooks', {
     method: 'PATCH',
     credentials: 'include',
     headers: {
@@ -104,7 +104,7 @@ export function updateWebHookAccessToken(webHookId, accessToken) {
 }
 
 export function deleteCrowdinWebHook(organizationId) {
-  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/gamification/connectors/crowdin/hooks/${organizationId}`, {
+  return fetch(`/gamification-crowdin/rest/crowdin/hooks/${organizationId}`, {
     method: 'DELETE',
     credentials: 'include',
   }).then(resp => {
@@ -115,7 +115,7 @@ export function deleteCrowdinWebHook(organizationId) {
 }
 
 export function getWebHookRepos(organizationId, page, perPage, keyword) {
-  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/gamification/connectors/crowdin/hooks/${organizationId}/repos?page=${page || 0}&perPage=${perPage|| 10}&keyword=${keyword || ''}`, {
+  return fetch(`/gamification-crowdin/rest/crowdin/hooks/${organizationId}/repos?page=${page || 0}&perPage=${perPage|| 10}&keyword=${keyword || ''}`, {
     method: 'GET',
     credentials: 'include',
   }).then((resp) => {
@@ -133,7 +133,7 @@ export function saveRepositoryStatus(repositoryId, organizationId, enabled) {
   formData.append('organizationId', organizationId);
   formData.append('enabled', enabled);
 
-  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/gamification/connectors/crowdin/hooks/repo/status`, {
+  return fetch('/gamification-crowdin/rest/crowdin/hooks/repo/status', {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -151,7 +151,7 @@ export function enableDisableWatchScope(organizationId, enabled) {
   const formData = new FormData();
   formData.append('organizationId', organizationId);
   formData.append('enabled', enabled);
-  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/gamification/connectors/crowdin/hooks/watchScope/status`, {
+  return fetch('/gamification-crowdin/rest/crowdin/hooks/watchScope/status', {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -166,7 +166,7 @@ export function enableDisableWatchScope(organizationId, enabled) {
 }
 
 export function forceUpdateWebhooks() {
-  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/gamification/connectors/crowdin/hooks/forceUpdate`, {
+  return fetch('/gamification-crowdin/rest/crowdin/hooks/forceUpdate', {
     method: 'PATCH',
     credentials: 'include',
     headers: {

@@ -132,7 +132,7 @@ export default {
       if (this.hook?.avatarUrl) {
         return `${this.hook.avatarUrl}?version=${new Date().getTime()}`;
       } else {
-        return '/gamification-crowdin/skin/images/CrowdinDefaultAvatar.png';
+        return '/gamification-crowdin/images/crowdin.png';
       }
     },
     watchedByLabel() {

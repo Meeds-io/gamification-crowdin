@@ -20,30 +20,35 @@ package io.meeds.gamification.crowdin.rest.builder;
 import io.meeds.gamification.crowdin.model.RemoteProject;
 import io.meeds.gamification.crowdin.model.WebHook;
 import io.meeds.gamification.crowdin.rest.model.WebHookRestEntity;
-import io.meeds.gamification.crowdin.services.CrowdinConsumerService;
 import io.meeds.gamification.crowdin.services.WebhookService;
+import io.meeds.gamification.crowdin.storage.CrowdinConsumerStorage;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.List;
 
+@Component
 public class WebHookBuilder {
 
   private static final Log LOG                = ExoLogger.getLogger(WebHookBuilder.class);
+
+  @Autowired
+  private CrowdinConsumerStorage crowdinConsumerStorage;
 
   private WebHookBuilder() {
     // Class with static methods
   }
 
-  public static WebHookRestEntity toRestEntity(WebhookService webhookService,
-                                               CrowdinConsumerService crowdinConsumerService, WebHook webHook) {
+  public WebHookRestEntity toRestEntity(WebhookService webhookService, WebHook webHook) {
     if (webHook == null) {
       return null;
     }
-    RemoteProject remoteOrganization = null;
+    RemoteProject remoteProject = null;
     try {
-      remoteOrganization = crowdinConsumerService.retrieveRemoteProject(webHook.getProjectId(), webHook.getToken());
+      remoteProject = crowdinConsumerStorage.retrieveRemoteProject(webHook.getProjectId(), webHook.getToken());
     } catch (IllegalAccessException e) {
       LOG.error(e);
     }
@@ -58,13 +63,13 @@ public class WebHookBuilder {
                                  webHook.getUpdatedDate(),
                                  webHook.getRefreshDate(),
                                  webHook.getProjectName(),
-                                 remoteOrganization != null ? remoteOrganization.getIdentifier() : null,
-                                 remoteOrganization != null ? remoteOrganization.getDescription() : null,
-                                 remoteOrganization != null ? remoteOrganization.getAvatarUrl() : null,
+                                 remoteProject != null ? remoteProject.getIdentifier() : null,
+                                 remoteProject != null ? remoteProject.getDescription() : null,
+                                 remoteProject != null ? remoteProject.getAvatarUrl() : null,
                                  webhookService.isWebHookWatchLimitEnabled(webHook.getProjectId()));
   }
 
-  public static List<WebHookRestEntity> toRestEntities(WebhookService webhookService, CrowdinConsumerService crowdinConsumerService, Collection<WebHook> webHooks) {
-    return webHooks.stream().map(webHook -> toRestEntity(webhookService, crowdinConsumerService, webHook)).toList();
+  public List<WebHookRestEntity> toRestEntities(WebhookService webhookService,  Collection<WebHook> webHooks) {
+    return webHooks.stream().map(webHook -> toRestEntity(webhookService, webHook)).toList();
   }
 }

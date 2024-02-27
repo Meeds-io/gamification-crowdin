@@ -89,6 +89,8 @@ export default {
       return this.hooksCount > this.limit;
     },
     emptyHookList() {
+      console.log('this.hooks');
+      console.log(this.hooks);
       return this.hooks?.length === 0;
     }
   },
@@ -101,10 +103,15 @@ export default {
   },
   methods: {
     refreshHooks() {
+      console.log('refreshHooks');
       this.loading = true;
       return this.$crowdinConnectorService.getCrowdinWebHooks(this.offset, this.limit)
         .then(data => {
-          this.hooks = data.webhooks;
+          this.hooks = data;
+          console.log('refreshHooks: this.hooks');
+          console.log(this.hooks);
+          console.log('refreshHooks: data.webhooks');
+          console.log(data);
           this.hooksCount = data.size || 0;
           return this.$nextTick()
             .then(() => {

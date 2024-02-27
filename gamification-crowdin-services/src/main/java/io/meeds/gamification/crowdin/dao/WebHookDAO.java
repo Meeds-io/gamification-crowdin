@@ -19,9 +19,10 @@ import io.meeds.gamification.crowdin.entity.WebhookEntity;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import org.exoplatform.commons.persistence.impl.GenericDAOJPAImpl;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-
+@Component
 public class WebHookDAO extends GenericDAOJPAImpl<WebhookEntity, Long> {
 
   public static final String PROJECT_ID = "projectId";
