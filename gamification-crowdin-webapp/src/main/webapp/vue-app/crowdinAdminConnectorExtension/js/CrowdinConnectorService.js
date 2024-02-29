@@ -103,8 +103,8 @@ export function updateWebHookAccessToken(webHookId, accessToken) {
   });
 }
 
-export function deleteCrowdinWebHook(organizationId) {
-  return fetch(`/gamification-crowdin/rest/crowdin/hooks/${organizationId}`, {
+export function deleteCrowdinWebHook(projectId) {
+  return fetch(`/gamification-crowdin/rest/crowdin/hooks/${projectId}`, {
     method: 'DELETE',
     credentials: 'include',
   }).then(resp => {
@@ -114,8 +114,8 @@ export function deleteCrowdinWebHook(organizationId) {
   });
 }
 
-export function getWebHookRepos(organizationId, page, perPage, keyword) {
-  return fetch(`/gamification-crowdin/rest/crowdin/hooks/${organizationId}/repos?page=${page || 0}&perPage=${perPage|| 10}&keyword=${keyword || ''}`, {
+export function getWebHookRepos(projectId, page, perPage, keyword) {
+  return fetch(`/gamification-crowdin/rest/crowdin/hooks/${projectId}/repos?page=${page || 0}&perPage=${perPage|| 10}&keyword=${keyword || ''}`, {
     method: 'GET',
     credentials: 'include',
   }).then((resp) => {
@@ -127,10 +127,10 @@ export function getWebHookRepos(organizationId, page, perPage, keyword) {
   });
 }
 
-export function saveRepositoryStatus(repositoryId, organizationId, enabled) {
+export function saveRepositoryStatus(repositoryId, projectId, enabled) {
   const formData = new FormData();
   formData.append('repositoryId', repositoryId);
-  formData.append('organizationId', organizationId);
+  formData.append('projectId', projectId);
   formData.append('enabled', enabled);
 
   return fetch('/gamification-crowdin/rest/crowdin/hooks/repo/status', {
@@ -147,9 +147,9 @@ export function saveRepositoryStatus(repositoryId, organizationId, enabled) {
   });
 }
 
-export function enableDisableWatchScope(organizationId, enabled) {
+export function enableDisableWatchScope(projectId, enabled) {
   const formData = new FormData();
-  formData.append('organizationId', organizationId);
+  formData.append('projectId', projectId);
   formData.append('enabled', enabled);
   return fetch('/gamification-crowdin/rest/crowdin/hooks/watchScope/status', {
     method: 'POST',

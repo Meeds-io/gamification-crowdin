@@ -119,7 +119,7 @@ public class WebhookService {
 
     public void deleteWebhookHook(long projectId, String currentUser) throws IllegalAccessException, ObjectNotFoundException {
         if (!Utils.isRewardingManager(currentUser)) {
-            throw new IllegalAccessException("The user is not authorized to delete GitHub hook");
+            throw new IllegalAccessException("The user is not authorized to delete Crowdin hook");
         }
         WebHook webHook = webHookStorage.getWebhookByProjectId(projectId);
         if (webHook == null) {
@@ -152,6 +152,24 @@ public class WebhookService {
     public List<WebHook> getWebhooks(int offset, int limit) {
         List<Long> hooksIds = webHookStorage.getWebhookIds(offset, limit);
         return hooksIds.stream().map(webHookStorage::getWebHookById).toList();
+    }
+
+    public WebHook getWebhookId(long webhookId, String username) throws IllegalAccessException, ObjectNotFoundException {
+        if (!Utils.isRewardingManager(username)) {
+            throw new IllegalAccessException(AUTHORIZED_TO_ACCESS_CROWDIN_HOOKS);
+        }
+        WebHook webHook = getWebhookId(webhookId);
+        if (webHook == null) {
+            throw new ObjectNotFoundException("Webhook doesn't exist");
+        }
+        return webHook;
+    }
+
+    public WebHook getWebhookId(long webhookId) {
+        if (webhookId <= 0) {
+            throw new IllegalArgumentException("Webhook id is mandatory");
+        }
+        return webHookStorage.getWebHookById(webhookId);
     }
 
     private void forceUpdateWebhook(WebHook webHook) {

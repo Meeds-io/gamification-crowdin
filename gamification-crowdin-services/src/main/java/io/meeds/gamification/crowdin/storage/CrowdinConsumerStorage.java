@@ -253,7 +253,7 @@ public class CrowdinConsumerStorage {
             project.setId(jsonObject.getInt("id"));
             project.setName(jsonObject.getString("name"));
             project.setIdentifier(jsonObject.getString("identifier"));
-            project.setIdentifier(jsonObject.getString("identifier"));
+            project.setAvatarUrl(jsonObject.getString("logo"));
 
             return project;
         } catch (IllegalArgumentException e) {

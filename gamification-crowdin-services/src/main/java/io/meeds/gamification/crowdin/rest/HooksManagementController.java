@@ -23,19 +23,15 @@ import io.meeds.gamification.crowdin.rest.builder.WebHookBuilder;
 import io.meeds.gamification.crowdin.rest.model.WebHookList;
 import io.meeds.gamification.crowdin.rest.model.WebHookRestEntity;
 import io.meeds.gamification.crowdin.services.WebhookService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.apache.commons.lang3.StringUtils;
-
 import org.exoplatform.commons.ObjectAlreadyExistsException;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.services.security.ConversationState;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -88,6 +84,30 @@ public class HooksManagementController {
         } catch (IllegalAccessException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
 
+        }
+    }
+
+    @GetMapping("{webHookId}")
+    @Secured("rewarding")
+    @Operation(summary = "Retrieves a webHook by its technical identifier", method = "GET")
+    @ApiResponse(responseCode = "200", description = "Request fulfilled")
+    @ApiResponse(responseCode = "404", description = "Not found")
+    @ApiResponse(responseCode = "400", description = "Bad request")
+    @ApiResponse(responseCode = "401", description = "Unauthorized")
+    @ApiResponse(responseCode = "503", description = "Service unavailable")
+    public WebHook getWebHookById(@Parameter(description = "WebHook technical identifier", required = true) @PathVariable("webHookId") long webHookId) {
+        if (webHookId == 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "WebHook Id must be not null");
+        }
+        String currentUser = getCurrentUser();
+        try {
+            return webhookService.getWebhookId(webHookId, currentUser);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (IllegalAccessException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        } catch (ObjectNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 
@@ -169,7 +189,7 @@ public class HooksManagementController {
 
     private List<WebHookRestEntity> getWebHookRestEntities(String username) throws IllegalAccessException {
         Collection<WebHook> webHooks = webhookService.getWebhooks(username, 0, 20, false);
-        return webHookBuilder.toRestEntities(webhookService, webHooks);
+        return webHookBuilder.toRestEntities(webHooks);
     }
 
 }

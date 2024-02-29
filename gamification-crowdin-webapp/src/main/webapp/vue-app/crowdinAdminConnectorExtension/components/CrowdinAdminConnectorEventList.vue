@@ -4,40 +4,40 @@
       <v-card-text class="text-color text-subtitle-1 pa-0 py-2">{{ $t('gamification.label.events.placeholder') }}</v-card-text>
       <v-spacer />
       <v-card
-        width="220"
-        max-width="100%"
-        flat>
+          width="220"
+          max-width="100%"
+          flat>
         <v-text-field
-          v-model="keyword"
-          :placeholder="$t('gamification.label.filter.filterEvents')"
-          prepend-inner-icon="fa-filter icon-default-color"
-          clear-icon="fa-times fa-1x"
-          class="pa-0 me-3 my-auto"
-          clearable
-          hide-details />
+            v-model="keyword"
+            :placeholder="$t('gamification.label.filter.filterEvents')"
+            prepend-inner-icon="fa-filter icon-default-color"
+            clear-icon="fa-times fa-1x"
+            class="pa-0 me-3 my-auto"
+            clearable
+            hide-details />
       </v-card>
     </v-subheader>
     <v-data-table
-      :headers="triggersHeaders"
-      :items="triggersToDisplay"
-      :options.sync="options"
-      :server-items-length="pageSize"
-      :show-rows-border="false"
-      :loading="loading"
-      mobile-breakpoint="0"
-      hide-default-footer
-      disable-sort>
+        :headers="triggersHeaders"
+        :items="triggersToDisplay"
+        :options.sync="options"
+        :server-items-length="pageSize"
+        :show-rows-border="false"
+        :loading="loading"
+        mobile-breakpoint="0"
+        hide-default-footer
+        disable-sort>
       <template slot="item" slot-scope="props">
-        <crowdin-admin-connector-event-item :trigger="props.item" :organization-id="organizationId" />
+        <crowdin-admin-connector-event-item :trigger="props.item" :project-id="projectId" />
       </template>
     </v-data-table>
     <div v-if="hasMoreTriggers" class="d-flex justify-center py-4">
       <v-btn
-        :loading="loading"
-        min-width="95%"
-        class="btn"
-        text
-        @click="loadMore">
+          :loading="loading"
+          min-width="95%"
+          class="btn"
+          text
+          @click="loadMore">
         {{ $t('rules.loadMore') }}
       </v-btn>
     </div>
@@ -66,8 +66,8 @@ export default {
     };
   },
   computed: {
-    organizationId() {
-      return this.hook?.organizationId;
+    projectId() {
+      return this.hook?.projectId;
     },
     triggersHeaders() {
       return [
