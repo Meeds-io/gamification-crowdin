@@ -17,68 +17,68 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <v-card
-    flat
-    v-on="isValidToken && !rateLimitReached ? { click: openHookDetail } : {}">
+      flat
+      v-on="isValidToken && !rateLimitReached ? { click: openHookDetail } : {}">
     <div :class="!isValidToken && 'filter-blur-3'">
       <v-list-item class="px-0" three-line>
         <v-list-item-avatar size="58" tile>
           <v-img
-            :src="avatarUrl"
-            :key="avatarUrl"
-            :alt="title" />
+              :src="avatarUrl"
+              :key="avatarUrl"
+              :alt="title" />
         </v-list-item-avatar>
         <v-list-item-content>
           <v-list-item-title class="align-self-start">
-            {{ name }} / {{ title }}
+            {{ title }}
           </v-list-item-title>
           <v-list-item-subtitle v-if="description" class="text-truncate-2 caption mt-1 text-color">{{ description }}</v-list-item-subtitle>
           <v-list-item-subtitle class="d-flex flex-row">
             <span class="text-truncate caption d-content pt-2px text-color"> {{ watchedByLabel }} </span>
             <exo-user-avatar
-              :profile-id="watchedBy"
-              extra-class="ms-1"
-              fullname
-              popover />
+                :profile-id="watchedBy"
+                extra-class="ms-1"
+                fullname
+                popover />
           </v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-action class="d-flex flex-row align-center">
           <v-btn
-            icon
-            class="mx-2"
-            @click="editCrowdinWebHook">
+              icon
+              class="mx-2"
+              @click="editCrowdinWebHook">
             <v-icon size="20">fas fa-edit</v-icon>
           </v-btn>
           <v-btn
-            icon
-            @click="deleteConfirmDialog">
+              icon
+              @click="deleteConfirmDialog">
             <v-icon class="error-color mx-2" size="20">fas fa-trash-alt</v-icon>
           </v-btn>
         </v-list-item-action>
       </v-list-item>
     </div>
+    <v-overlay
+        :value="!isValidToken"
+        absolute
+        opacity="0.7"
+        class="d-flex position-absolute height-auto width-auto">
+      <div class="d-flex flex-row">
+        <div class="d-flex flex-column me-5">
+          <span class="text-h6">{{ $t('crowdinConnector.webhook.crowdin.tokenExpiredOrInvalid') }}</span>
+          <span class="text-h6">{{ $t('crowdinConnector.webhook.crowdin.regenerateAnotherToken') }}</span>
+        </div>
+        <v-btn
+            class="ma-auto"
+            color="primary"
+            @click="editCrowdinWebHook">
+          {{ $t('crowdinConnector.webhook.crowdin.reviewSettings') }}
+        </v-btn>
+      </div>
+    </v-overlay>
 <!--    <v-overlay-->
-<!--      :value="!isValidToken"-->
-<!--      absolute-->
-<!--      opacity="0.7"-->
-<!--      class="d-flex position-absolute height-auto width-auto">-->
-<!--      <div class="d-flex flex-row">-->
-<!--        <div class="d-flex flex-column me-5">-->
-<!--          <span class="text-h6">{{ $t('crowdinConnector.webhook.crowdin.tokenExpiredOrInvalid') }}</span>-->
-<!--          <span class="text-h6">{{ $t('crowdinConnector.webhook.crowdin.regenerateAnotherToken') }}</span>-->
-<!--        </div>-->
-<!--        <v-btn-->
-<!--          class="ma-auto"-->
-<!--          color="primary"-->
-<!--          @click="editCrowdinWebHook">-->
-<!--          {{ $t('crowdinConnector.webhook.crowdin.reviewSettings') }}-->
-<!--        </v-btn>-->
-<!--      </div>-->
-<!--    </v-overlay>-->
-<!--    <v-overlay-->
-<!--      :value="isValidToken && rateLimitReached"-->
-<!--      absolute-->
-<!--      opacity="0.7"-->
-<!--      class="d-flex position-absolute height-auto width-auto">-->
+<!--        :value="isValidToken && rateLimitReached"-->
+<!--        absolute-->
+<!--        opacity="0.7"-->
+<!--        class="d-flex position-absolute height-auto width-auto">-->
 <!--      <div class="d-flex flex-row">-->
 <!--        <div class="d-flex flex-column me-5">-->
 <!--          <span class="text-h6">{{ $t('crowdinConnector.webhook.crowdin.tokenRateLimitReached') }}</span>-->
@@ -87,12 +87,12 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 <!--      </div>-->
 <!--    </v-overlay>-->
     <exo-confirm-dialog
-      ref="deleteHookConfirmDialog"
-      :message="$t('crowdinConnector.webhook.message.confirmDeleteConnectorHook')"
-      :title="$t('crowdinConnector.webhook.title.confirmDeleteProject')"
-      :ok-label="$t('confirm.yes')"
-      :cancel-label="$t('confirm.no')"
-      @ok="deleteHook" />
+        ref="deleteHookConfirmDialog"
+        :message="$t('crowdinConnector.webhook.message.confirmDeleteConnectorHook')"
+        :title="$t('crowdinConnector.webhook.title.confirmDeleteProject')"
+        :ok-label="$t('confirm.yes')"
+        :cancel-label="$t('confirm.no')"
+        @ok="deleteHook" />
   </v-card>
 </template>
 
@@ -149,26 +149,17 @@ export default {
       return this.hook?.projectId;
     },
     isValidToken() {
-      // return this.hook?.tokenStatus?.valid;
-      return true;
-    },
+      return this.hook?.tokenValid;
+    }
     // tokenRemaining() {
     //   return this.hook?.tokenStatus?.remaining;
     // },
-    tokenResetTime() {
-      return this.hook?.tokenStatus?.reset;
-    },
+    // tokenResetTime() {
+    //   return this.hook?.tokenStatus?.reset;
+    // },
     // rateLimitReached() {
     //   return this.tokenRemaining < 0;
     // }
-  },
-  created() {
-    this.timeUntilReset = this.tokenResetTime - Math.floor(Date.now() / 1000); // Initialize the timer
-    setInterval(() => {
-      if (this.timeUntilReset > 0) {
-        this.timeUntilReset--;
-      }
-    }, 1000);
   },
   methods: {
     deleteConfirmDialog(event) {
@@ -192,12 +183,6 @@ export default {
     },
     openHookDetail() {
       this.$root.$emit('crowdin-hook-detail', this.hook);
-    },
-    formatTime(seconds) {
-      const hours = Math.floor(seconds / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-      const remainingSeconds = seconds % 60;
-      return `${hours}:${minutes}:${remainingSeconds}`;
     }
   }
 };

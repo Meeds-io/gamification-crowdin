@@ -2,17 +2,17 @@
   <tr>
     <td class="ps-0 no-border-bottom">
       <gamification-admin-connector-trigger
-        :trigger="trigger"
-        class="py-2" />
+          :trigger="trigger"
+          class="py-2" />
     </td>
     <td class="no-border-bottom d-flex justify-center py-2">
       <div class="d-flex flex-column align-center">
         <v-switch
-          v-model="enabled"
-          :ripple="false"
-          color="primary"
-          class="my-auto"
-          @change="enableDisableTrigger" />
+            v-model="enabled"
+            :ripple="false"
+            color="primary"
+            class="my-auto"
+            @change="enableDisableTrigger" />
       </div>
     </td>
   </tr>
@@ -25,7 +25,7 @@ export default {
       type: Object,
       default: null
     },
-    organizationId: {
+    projectId: {
       type: String,
       default: null
     },
@@ -38,12 +38,12 @@ export default {
       return this.trigger?.disabledAccounts;
     },
     enabled() {
-      return !this.disabledAccounts.includes(this.organizationId);
+      return !this.disabledAccounts.includes(this.projectId);
     },
   },
   methods: {
     enableDisableTrigger() {
-      this.$gamificationConnectorService.saveTriggerStatus(this.title, this.organizationId, !this.enabled);
+      this.$gamificationConnectorService.saveTriggerStatus(this.title, this.projectId, !this.enabled);
     },
   }
 };

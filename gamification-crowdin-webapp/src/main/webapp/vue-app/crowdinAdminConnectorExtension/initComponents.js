@@ -20,8 +20,6 @@ import CrowdinAdminConnectionSettingDrawer from './components/CrowdinAdminConnec
 import CrowdinAdminConnectorHookList from './components/CrowdinAdminConnectorHookList.vue';
 import CrowdinAdminConnectorHook from './components/CrowdinAdminConnectorHook.vue';
 import CrowdinAdminConnectorHookDetail from './components/CrowdinAdminConnectorHookDetail.vue';
-import CrowdinAdminConnectorRepositoryItem from './components/CrowdinAdminConnectorRepositoryItem.vue';
-import CrowdinAdminConnectorRepositoryList from './components/CrowdinAdminConnectorRepositoryList.vue';
 import CrowdinAdminConnectorEventItem from './components/CrowdinAdminConnectorEventItem.vue';
 import CrowdinAdminConnectorEventList from './components/CrowdinAdminConnectorEventList.vue';
 
@@ -32,8 +30,6 @@ const components = {
   'crowdin-admin-connector-hook-list': CrowdinAdminConnectorHookList,
   'crowdin-admin-connector-hook': CrowdinAdminConnectorHook,
   'crowdin-admin-connector-hook-detail': CrowdinAdminConnectorHookDetail,
-  'crowdin-admin-connector-repository-item': CrowdinAdminConnectorRepositoryItem,
-  'crowdin-admin-connector-repository-list': CrowdinAdminConnectorRepositoryList,
   'crowdin-admin-connector-event-item': CrowdinAdminConnectorEventItem,
   'crowdin-admin-connector-event-list': CrowdinAdminConnectorEventList,
 };
