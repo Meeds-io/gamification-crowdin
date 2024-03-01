@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static io.meeds.gamification.crowdin.utils.Utils.AUTHORIZED_TO_ACCESS_CROWDIN_HOOKS;
+import static io.meeds.gamification.crowdin.utils.Utils.encode;
 
 
 @Service
@@ -83,6 +84,21 @@ public class WebhookService {
             webHook.setWatchedBy(currentUser);
             webHookStorage.saveWebHook(webHook);
         }
+    }
+
+    public void updateWebHookAccessToken(long webHookId, String accessToken, String currentUser) throws IllegalAccessException,
+            ObjectNotFoundException {
+        if (!Utils.isRewardingManager(currentUser)) {
+            throw new IllegalAccessException(AUTHORIZED_TO_ACCESS_CROWDIN_HOOKS);
+        }
+        if (webHookId <= 0) {
+            throw new IllegalArgumentException("webHook id must be positive");
+        }
+        WebHook webHook = webHookStorage.getWebHookById(webHookId);
+        if (webHook == null) {
+            throw new ObjectNotFoundException("webhook with id : " + webHookId + " wasn't found");
+        }
+        webHookStorage.updateWebHookAccessToken(webHookId, encode(accessToken));
     }
 
     public List<WebHook> getWebhooks(String currentUser, int offset, int limit, boolean forceUpdate) throws IllegalAccessException {

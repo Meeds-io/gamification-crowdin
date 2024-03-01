@@ -164,6 +164,35 @@ public class HooksManagementController {
         }
     }
 
+    @PatchMapping
+    @Secured("rewarding")
+    @Operation(summary = "Update a project webhook personal access token.", description = "Update a project webhook personal access token.", method = "PATCH")
+    @ApiResponse(responseCode = "200", description = "Request fulfilled")
+    @ApiResponse(responseCode = "404", description = "Not found")
+    @ApiResponse(responseCode = "400", description = "Bad request")
+    @ApiResponse(responseCode = "401", description = "Unauthorized")
+    @ApiResponse(responseCode = "409", description = "Conflict")
+    @ApiResponse(responseCode = "503", description = "Service unavailable")
+    public ResponseEntity updateWebHookAccessToken(@Parameter(description = "webHook id", required = true) @RequestParam("webHookId") long webHookId,
+                                             @Parameter(description = "Crowdin personal access token", required = true) @RequestParam("accessToken") String accessToken) {
+
+        if (webHookId <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'webHookId' must be positive");
+        }
+        if (StringUtils.isBlank(accessToken)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'accessToken' parameter is mandatory");
+        }
+        String currentUser = ConversationState.getCurrent().getIdentity().getUserId();
+        try {
+            webhookService.updateWebHookAccessToken(webHookId, accessToken, currentUser);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (IllegalAccessException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        } catch (ObjectNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, CROWDIN_HOOK_NOT_FOUND);
+        }
+    }
+
     @DeleteMapping("{projectId}")
     @Secured("rewarding")
     @Operation(summary = "Deletes crowdin project webhook", description = "Deletes crowdin project webhook", method = "DELETE")
