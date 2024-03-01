@@ -29,6 +29,7 @@ import java.util.List;
 
 import static io.meeds.gamification.crowdin.storage.mapper.WebHookMapper.fromEntity;
 import static io.meeds.gamification.crowdin.storage.mapper.WebHookMapper.toEntity;
+
 @Component
 public class WebHookStorage {
 
@@ -64,10 +65,10 @@ public class WebHookStorage {
     return fromEntity(webHookDAO.update(webhookEntity));
   }
 
-  public WebHook updateWebHookAccessToken(long webhookId, String accessToken) {
+  public void updateWebHookAccessToken(long webhookId, String accessToken) {
     WebhookEntity webhookEntity = webHookDAO.find(webhookId);
     webhookEntity.setToken(accessToken);
-    return fromEntity(webHookDAO.update(webhookEntity));
+    webHookDAO.update(webhookEntity);
   }
 
   public WebHook getWebHookById(Long id) {
