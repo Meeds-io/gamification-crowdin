@@ -36,13 +36,16 @@ public class WebHookBuilder {
   private static final Log LOG                = ExoLogger.getLogger(WebHookBuilder.class);
 
   @Autowired
+  private WebhookService webhookService;
+
+  @Autowired
   private CrowdinConsumerStorage crowdinConsumerStorage;
 
   private WebHookBuilder() {
     // Class with static methods
   }
 
-  public WebHookRestEntity toRestEntity(WebhookService webhookService, WebHook webHook) {
+  public WebHookRestEntity toRestEntity(WebHook webHook) {
     if (webHook == null) {
       return null;
     }
@@ -66,10 +69,11 @@ public class WebHookBuilder {
                                  remoteProject != null ? remoteProject.getIdentifier() : null,
                                  remoteProject != null ? remoteProject.getDescription() : null,
                                  remoteProject != null ? remoteProject.getAvatarUrl() : null,
-                                 webhookService.isWebHookWatchLimitEnabled(webHook.getProjectId()));
+                                 webhookService.isWebHookWatchLimitEnabled(webHook.getProjectId()),
+                      remoteProject != null);
   }
 
-  public List<WebHookRestEntity> toRestEntities(WebhookService webhookService,  Collection<WebHook> webHooks) {
-    return webHooks.stream().map(webHook -> toRestEntity(webhookService, webHook)).toList();
+  public List<WebHookRestEntity> toRestEntities(Collection<WebHook> webHooks) {
+    return webHooks.stream().map(this::toRestEntity).toList();
   }
 }

@@ -26,18 +26,18 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
       </div>
       <v-spacer />
       <v-btn
-        v-if="!emptyHookList"
-        class="ma-auto"
-        icon
-        @click="createCrowdinWebHook">
+          v-if="!emptyHookList"
+          class="ma-auto"
+          icon
+          @click="createCrowdinWebHook">
         <v-icon class="mx-2 primary--text" size="20">fas fa-plus</v-icon>
       </v-btn>
     </div>
     <div v-if="emptyHookList" class="d-flex align-center py-5">
       <v-btn
-        class="btn btn-primary ma-auto"
-        small
-        @click="createCrowdinWebHook">
+          class="btn btn-primary ma-auto"
+          small
+          @click="createCrowdinWebHook">
         <v-icon size="14" dark>
           fas fa-plus
         </v-icon>
@@ -47,24 +47,24 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
       </v-btn>
     </div>
     <v-progress-linear
-      v-show="loading"
-      color="primary"
-      height="2"
-      indeterminate />
+        v-show="loading"
+        color="primary"
+        height="2"
+        indeterminate />
     <div
-      v-for="hook in hooks"
-      :key="hook.name">
+        v-for="hook in hooks"
+        :key="hook.name">
       <crowdin-admin-connector-hook
-        class="full-height"
-        :hook="hook" />
+          class="full-height"
+          :hook="hook" />
     </div>
     <template v-if="hasMore">
       <v-btn
-        :loading="loading"
-        class="btn pa-0 mb-5"
-        text
-        block
-        @click="loadMore">
+          :loading="loading"
+          class="btn pa-0 mb-5"
+          text
+          block
+          @click="loadMore">
         {{ $t('crowdinConnector.webhook.label.loadMore') }}
       </v-btn>
     </template>
@@ -89,8 +89,6 @@ export default {
       return this.hooksCount > this.limit;
     },
     emptyHookList() {
-      console.log('this.hooks');
-      console.log(this.hooks);
       return this.hooks?.length === 0;
     }
   },
@@ -103,15 +101,10 @@ export default {
   },
   methods: {
     refreshHooks() {
-      console.log('refreshHooks');
       this.loading = true;
       return this.$crowdinConnectorService.getCrowdinWebHooks(this.offset, this.limit)
         .then(data => {
           this.hooks = data;
-          console.log('refreshHooks: this.hooks');
-          console.log(this.hooks);
-          console.log('refreshHooks: data.webhooks');
-          console.log(data);
           this.hooksCount = data.size || 0;
           return this.$nextTick()
             .then(() => {

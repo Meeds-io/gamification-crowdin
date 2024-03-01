@@ -25,7 +25,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
     </template>
     <template v-if="drawer" #content>
       <v-form
-        ref="OrganizationForm"
+        ref="ProjectForm"
         v-model="isValidForm"
         class="form-horizontal pt-0 pb-4"
         flat
@@ -50,17 +50,14 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                       <v-icon size="14" class="pb-1 pe-1">fas fa-external-link-alt</v-icon>
                     </a>
                   </v-card-text>
-<!--                  <v-card-text class="pt-0 ps-0 text-color">-->
-<!--                    {{ $t('crowdinConnector.admin.label.accessToken.instructions.stepTwo') }}-->
-<!--                  </v-card-text>-->
                   <v-card-text class="pt-0 pb-1 ps-0 text-color">
                     {{ $t('crowdinConnector.admin.label.accessToken.instructions.stepThree') }} :
                   </v-card-text>
                   <span class="pt-0 ps-0 text-color">
-                    - (to be filled)
+                    - Projects (List, Get, Create, Edit)
                   </span>
                   <span class="pt-0 ps-0 text-color">
-                    - (to be filled)
+                    - Projects Webhooks
                   </span>
                 </div>
                 <div class="d-flex flex-column py-0">

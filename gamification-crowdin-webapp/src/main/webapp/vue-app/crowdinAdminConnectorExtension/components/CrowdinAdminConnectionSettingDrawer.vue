@@ -87,24 +87,6 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                     <v-card-text class="ps-0 py-0 text-color pb-1">
                       {{ $t('crowdinConnector.admin.label.stepTwo.instructionsThree') }}
                     </v-card-text>
-<!--                    <v-card-text class="text-color pb-1">-->
-<!--                      {{ $t('crowdinConnector.admin.label.homepageURL') }}:-->
-<!--                    </v-card-text>-->
-<!--                    <div class="d-flex flex-row">-->
-<!--                      <v-text-field-->
-<!--                        :value="currentUrl"-->
-<!--                        class="px-4 pt-0"-->
-<!--                        type="text"-->
-<!--                        outlined-->
-<!--                        disabled-->
-<!--                        dense />-->
-<!--                      <v-btn icon @click="copyText(currentUrl)">-->
-<!--                        <v-icon>fas fa-copy</v-icon>-->
-<!--                      </v-btn>-->
-<!--                    </div>-->
-<!--                    <v-card-text class="text-color pb-1">-->
-<!--                      {{ $t('crowdinConnector.admin.label.authorizationCallbackURL') }}:-->
-<!--                    </v-card-text>-->
                     <div class="d-flex flex-row">
                       <v-text-field
                         :value="redirectUrl"
@@ -117,6 +99,9 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                         <v-icon>fas fa-copy</v-icon>
                       </v-btn>
                     </div>
+                    <v-card-text class="ps-0 py-0 text-color pb-1">
+                      {{ $t('crowdinConnector.admin.label.stepTwo.instructionsFour') }}
+                    </v-card-text>
                   </div>
                 </v-slide-y-transition>
               </v-stepper-content>
@@ -217,7 +202,6 @@ export default {
     drawer: false,
     disabled: true,
     stepper: 0,
-    currentUrl: window.location.origin,
   }),
   created() {
     this.$root.$on('crowdin-connection-setting-drawer', this.open);
