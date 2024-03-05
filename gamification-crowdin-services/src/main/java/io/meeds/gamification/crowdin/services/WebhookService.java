@@ -33,8 +33,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static io.meeds.gamification.crowdin.utils.Utils.AUTHORIZED_TO_ACCESS_CROWDIN_HOOKS;
-import static io.meeds.gamification.crowdin.utils.Utils.encode;
+import static io.meeds.gamification.crowdin.utils.Utils.*;
 
 
 @Service
@@ -54,12 +53,8 @@ public class WebhookService {
     @Autowired
     private  WebHookStorage webHookStorage;
 
-    private static final String[]       CROWDIN_TRIGGERS        = new String[] { "file.added", "file.updated",
-            "file.reverted", "file.deleted", "file.translated", "file.approved", "project.translated",
-            "project.approved", "project.built", "translation.updated", "string.added", "string.updated",
-            "string.deleted", "stringComment.created", "stringComment.updated", "stringComment.deleted",
-            "stringComment.restored", "suggestion.added", "suggestion.updated", "suggestion.deleted",
-            "suggestion.approved", "suggestion.disapproved", "task.added", "task.statusChanged", "task.deleted" };
+    private static final String[] CROWDIN_EVENTS = new String[] { "stringComment.created",
+            "suggestion.added", "suggestion.approved"};
 
 
     public List<RemoteProject> getProjects(String accessToken) throws IllegalAccessException {
@@ -67,7 +62,8 @@ public class WebhookService {
     }
 
 
-    public void createWebhook(long projectId, String projectName, String accessToken, String currentUser) throws ObjectAlreadyExistsException, IllegalAccessException {
+    public void createWebhook(long projectId, String projectName, String accessToken, String currentUser) throws
+            ObjectAlreadyExistsException, IllegalAccessException {
         if (!Utils.isRewardingManager(currentUser)) {
             throw new IllegalAccessException("The user is not authorized to create Crowdin hook");
         }
@@ -77,7 +73,7 @@ public class WebhookService {
             throw new ObjectAlreadyExistsException(existsWebHook);
         }
 
-        WebHook webHook = crowdinConsumerStorage.createWebhook(projectId, CROWDIN_TRIGGERS, accessToken);
+        WebHook webHook = crowdinConsumerStorage.createWebhook(projectId, CROWDIN_EVENTS, accessToken);
 
         if (webHook != null) {
             webHook.setProjectName(projectName);
@@ -86,8 +82,8 @@ public class WebhookService {
         }
     }
 
-    public void updateWebHookAccessToken(long webHookId, String accessToken, String currentUser) throws IllegalAccessException,
-            ObjectNotFoundException {
+    public void updateWebHookAccessToken(long webHookId, String accessToken, String currentUser) throws
+            IllegalAccessException, ObjectNotFoundException {
         if (!Utils.isRewardingManager(currentUser)) {
             throw new IllegalAccessException(AUTHORIZED_TO_ACCESS_CROWDIN_HOOKS);
         }
@@ -101,7 +97,8 @@ public class WebhookService {
         webHookStorage.updateWebHookAccessToken(webHookId, encode(accessToken));
     }
 
-    public List<WebHook> getWebhooks(String currentUser, int offset, int limit, boolean forceUpdate) throws IllegalAccessException {
+    public List<WebHook> getWebhooks(String currentUser, int offset, int limit, boolean forceUpdate) throws
+            IllegalAccessException {
         if (!Utils.isRewardingManager(currentUser)) {
             throw new IllegalAccessException(AUTHORIZED_TO_ACCESS_CROWDIN_HOOKS);
         }
@@ -125,15 +122,21 @@ public class WebhookService {
     }
 
 
-    public void setWebHookWatchLimitEnabled(long projectRemoteId, boolean enabled, String currentUser) throws IllegalAccessException {
+    public void setWebHookWatchLimitEnabled(long projectRemoteId, boolean enabled, String currentUser) throws
+            IllegalAccessException {
         if (!Utils.isRewardingManager(currentUser)) {
             throw new IllegalAccessException("The user is not authorized to update webHook watch limit status");
         }
-        settingService.set(CROWDIN_WEBHOOK_CONTEXT, WATCH_LIMITED_SCOPE, String.valueOf(projectRemoteId), SettingValue.create(enabled));
+        settingService.set(
+                CROWDIN_WEBHOOK_CONTEXT,
+                WATCH_LIMITED_SCOPE,
+                String.valueOf(projectRemoteId),
+                SettingValue.create(enabled));
     }
 
 
-    public void deleteWebhookHook(long projectId, String currentUser) throws IllegalAccessException, ObjectNotFoundException {
+    public void deleteWebhookHook(long projectId, String currentUser) throws IllegalAccessException,
+            ObjectNotFoundException {
         if (!Utils.isRewardingManager(currentUser)) {
             throw new IllegalAccessException("The user is not authorized to delete Crowdin hook");
         }
@@ -170,7 +173,8 @@ public class WebhookService {
         return hooksIds.stream().map(webHookStorage::getWebHookById).toList();
     }
 
-    public WebHook getWebhookId(long webhookId, String username) throws IllegalAccessException, ObjectNotFoundException {
+    public WebHook getWebhookId(long webhookId, String username) throws IllegalAccessException,
+            ObjectNotFoundException {
         if (!Utils.isRewardingManager(username)) {
             throw new IllegalAccessException(AUTHORIZED_TO_ACCESS_CROWDIN_HOOKS);
         }
