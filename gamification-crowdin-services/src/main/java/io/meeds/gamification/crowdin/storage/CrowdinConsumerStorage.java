@@ -102,7 +102,7 @@ public class CrowdinConsumerStorage {
 
             JSONObject requestJson = new JSONObject();
             requestJson.put("name", "Meeds");
-            requestJson.put("url", CommonsUtils.getCurrentDomain() + "/portal/rest/gamification/connectors/crowdin/webhooks");
+            requestJson.put("url", CommonsUtils.getCurrentDomain() + "/gamification-crowdin/rest/crowdin/webhooks");
             requestJson.put("events", events);
             requestJson.put("requestType", "POST");
             requestJson.put("isActive", true);
@@ -117,6 +117,8 @@ public class CrowdinConsumerStorage {
             LOG.info("uri : " + uri);
 
             String response = processPost(uri, requestJson.toString(), accessToken);
+
+            LOG.info("response : " + response);
 
             JSONObject responseJson = new JSONObject(response);
 
@@ -247,20 +249,30 @@ public class CrowdinConsumerStorage {
 
             URI uri = URI.create(CROWDIN_API_URL + PROJECTS + projectRemoteId);
             String response = processGet(uri, accessToken);
-            JSONObject jsonObject = new JSONObject(response).getJSONObject("data");
-
-            RemoteProject project = new RemoteProject();
-            project.setId(jsonObject.getInt("id"));
-            project.setName(jsonObject.getString("name"));
-            project.setIdentifier(jsonObject.getString("identifier"));
-            project.setAvatarUrl(jsonObject.getString("logo"));
-
-            return project;
+            if (response == null) {
+                return null;
+            }
+            return getRemoteProject(response);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(e);
         } catch (CrowdinConnectionException e) {
             throw new IllegalAccessException("crowdin.tokenExpiredOrInvalid");
         }
+    }
+
+    private static RemoteProject getRemoteProject(String response) {
+        JSONObject responseJson = new JSONObject(response);
+        JSONObject jsonObject = responseJson.getJSONObject("data");
+
+        RemoteProject project = new RemoteProject();
+        project.setId(jsonObject.getInt("id"));
+        project.setName(jsonObject.getString("name"));
+        project.setIdentifier(jsonObject.getString("identifier"));
+        if(jsonObject.get("logo") instanceof String) {
+            project.setAvatarUrl(jsonObject.getString("logo"));
+        }
+        
+        return project;
     }
 
     public String deleteWebhook(WebHook webHook) {
