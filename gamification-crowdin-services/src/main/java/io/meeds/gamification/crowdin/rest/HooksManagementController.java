@@ -136,7 +136,7 @@ public class HooksManagementController {
     @PostMapping
     @Secured("rewarding")
     @Operation(summary = "Create a project webhook for Remote Crowdin connector.", description = "Create a project webhook for Remote Crowdin connector.", method = "POST")
-    @ApiResponse(responseCode = "200", description = "Request fulfilled")
+    @ApiResponse(responseCode = "201", description = "Created")
     @ApiResponse(responseCode = "404", description = "Not found")
     @ApiResponse(responseCode = "400", description = "Bad request")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -144,7 +144,6 @@ public class HooksManagementController {
     @ApiResponse(responseCode = "503", description = "Service unavailable")
     public ResponseEntity<Object> createWebhookHook(@Parameter(description = "Crowdin project id", required = true) @RequestParam("projectId") Long projectId,
                                                     @Parameter(description = "Crowdin project name", required = true) @RequestParam("projectName") String projectName,
-                                                    @Parameter(description = "Crowdin project logo", required = true) @RequestParam("projectLogo") String projectLogo,
                                                     @Parameter(description = "Crowdin personal access token", required = true) @RequestParam("accessToken") String accessToken) {
 
         if (projectId == null || StringUtils.isBlank(projectName)) {
@@ -167,7 +166,7 @@ public class HooksManagementController {
     @PatchMapping
     @Secured("rewarding")
     @Operation(summary = "Update a project webhook personal access token.", description = "Update a project webhook personal access token.", method = "PATCH")
-    @ApiResponse(responseCode = "200", description = "Request fulfilled")
+    @ApiResponse(responseCode = "201", description = "Updated")
     @ApiResponse(responseCode = "404", description = "Not found")
     @ApiResponse(responseCode = "400", description = "Bad request")
     @ApiResponse(responseCode = "401", description = "Unauthorized")

@@ -2,19 +2,19 @@ export function init() {
   extensionRegistry.registerExtension('engagementCenterActions', 'user-actions', {
     type: 'crowdin',
     options: {
-      rank: 80,
+      rank: 90,
       image: '/gamification-crowdin/images/crowdin.png',
       match: (actionLabel) => [
-        'stringComment.created',
-        'suggestion.added',
-        'suggestion.approved',
-        'approve.suggestion'
+        'stringCommentCreated',
+        'suggestionAdded',
+        'suggestionApproved',
+        'approveSuggestion'
       ].includes(actionLabel),
       getLink: (realization) => {
         realization.link = realization.objectId;
         return realization.link;
       },
-      isExtensible: true
+      isExtensible: false
     },
   });
 }

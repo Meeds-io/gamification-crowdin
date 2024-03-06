@@ -39,7 +39,7 @@
                             <string>crowdin</string>
                         </field>
                         <field name="trigger">
-                            <string>stringComment.created</string>
+                            <string>stringCommentCreated</string>
                         </field>
                         <field name="cancellerEvents">
                             <collection type="java.util.ArrayList" item-type="java.lang.String">
@@ -70,7 +70,7 @@
                             <string>crowdin</string>
                         </field>
                         <field name="trigger">
-                            <string>suggestion.added</string>
+                            <string>suggestionAdded</string>
                         </field>
                         <field name="cancellerEvents">
                             <collection type="java.util.ArrayList" item-type="java.lang.String">
@@ -101,7 +101,7 @@
                             <string>crowdin</string>
                         </field>
                         <field name="trigger">
-                            <string>suggestion.approved</string>
+                            <string>suggestionApproved</string>
                         </field>
                         <field name="cancellerEvents">
                             <collection type="java.util.ArrayList" item-type="java.lang.String">
@@ -132,12 +132,12 @@
                             <string>crowdin</string>
                         </field>
                         <field name="trigger">
-                            <string>approve.suggestion</string>
+                            <string>approveSuggestion</string>
                         </field>
                         <field name="cancellerEvents">
                             <collection type="java.util.ArrayList" item-type="java.lang.String">
                                 <value>
-                                    <string>suggestionDisapproved</string>
+                                    <string>disapproveSuggestion</string>
                                 </value>
                             </collection>
                         </field>
