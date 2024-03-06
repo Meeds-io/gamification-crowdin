@@ -137,7 +137,7 @@
                         <field name="cancellerEvents">
                             <collection type="java.util.ArrayList" item-type="java.lang.String">
                                 <value>
-                                    <string>suggestionDisapproved</string>
+                                    <string>disapproveSuggestion</string>
                                 </value>
                             </collection>
                         </field>

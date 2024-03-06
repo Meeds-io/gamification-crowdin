@@ -53,8 +53,8 @@ public class WebhookService {
     @Autowired
     private  WebHookStorage webHookStorage;
 
-    private static final String[] CROWDIN_EVENTS = new String[] { "stringComment.created",
-            "suggestion.added", "suggestion.approved"};
+    private static final String[] CROWDIN_EVENTS = new String[] { "stringComment.created", "stringComment.deleted",
+            "suggestion.added", "suggestion.deleted", "suggestion.approved", "suggestion.disapproved"};
 
 
     public List<RemoteProject> getProjects(String accessToken) throws IllegalAccessException {

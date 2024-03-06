@@ -16,13 +16,14 @@ import static io.meeds.gamification.crowdin.utils.Utils.extractSubItem;
 
 @Component
 public class SuggestionAddedTriggerPlugin extends CrowdinTriggerPlugin {
+    private static final Log LOG                = ExoLogger.getLogger(SuggestionAddedTriggerPlugin.class);
     protected String EVENT_PAYLOAD_OBJECT_NAME = "translation";
+    protected String EVENT_TITLE =  "suggestionAdded";
     protected String EVENT_TRIGGER =  "suggestion.added";
+    protected String CANCELLING_EVENT_TRIGGER =  "suggestion.deleted";
 
     @Autowired
     private CrowdinTriggerService crowdinTriggerService;
-
-    protected String EVENT_TITLE =  "suggestionAdded";
 
     @PostConstruct
     public void initData() {
@@ -30,18 +31,29 @@ public class SuggestionAddedTriggerPlugin extends CrowdinTriggerPlugin {
     }
 
     @Override
-    public List<Event> getEvents(Map<String, Object> payload) {
+    public List<Event> getEvents(String trigger, Map<String, Object> payload) {
+        if (extractSubItem(payload, getPayloadObjectName(), "provider") != null) {
+            LOG.warn("Crowdin event {} translation provider is TM or MT", EVENT_TRIGGER);
+            return Collections.emptyList();
+        }
+
         return Collections.singletonList(new Event(EVENT_TITLE,
-                null,
+                extractSubItem(payload, getPayloadObjectName(), "user", "username"),
                 extractSubItem(payload, getPayloadObjectName(), "user", "username"),
                 extractSubItem(payload, getPayloadObjectName(), "id"),
-                null,
-                extractSubItem(payload, getPayloadObjectName(), "string", "project", "id")));
+                EVENT_PAYLOAD_OBJECT_NAME,
+                extractSubItem(payload, getPayloadObjectName(), "string", "project", "id"),
+                trigger.equals(CANCELLING_EVENT_TRIGGER)));
     }
 
     @Override
-    public String getName() {
+    public String getEventName() {
         return EVENT_TRIGGER;
+    }
+
+    @Override
+    public String getCancellingEventName() {
+        return CANCELLING_EVENT_TRIGGER;
     }
 
     @Override

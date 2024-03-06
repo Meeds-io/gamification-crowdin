@@ -16,7 +16,9 @@ import static io.meeds.gamification.crowdin.utils.Utils.extractSubItem;
 public class StringCommentCreatedTriggerPlugin extends CrowdinTriggerPlugin {
 
     protected String EVENT_PAYLOAD_OBJECT_NAME = "comment";
-    protected String EVENT_NAME =  "stringComment.created";
+    protected String EVENT_TITLE =  "stringCommentCreated";
+    protected String EVENT_TRIGGER =  "stringComment.created";
+    protected String CANCELLING_EVENT_TRIGGER =  "stringComment.deleted";
 
     @Autowired
     private CrowdinTriggerService crowdinTriggerService;
@@ -27,18 +29,24 @@ public class StringCommentCreatedTriggerPlugin extends CrowdinTriggerPlugin {
     }
 
     @Override
-    public List<Event> getEvents(Map<String, Object> payload) {
-        return Collections.singletonList(new Event(EVENT_NAME,
-                null,
+    public List<Event> getEvents(String trigger, Map<String, Object> payload) {
+        return Collections.singletonList(new Event(EVENT_TITLE,
+                extractSubItem(payload, getPayloadObjectName(), "user", "username"),
                 extractSubItem(payload, getPayloadObjectName(), "user", "username"),
                 extractSubItem(payload, getPayloadObjectName(), "id"),
-                null,
-                extractSubItem(payload, getPayloadObjectName(), "string", "project", "id")));
+                EVENT_PAYLOAD_OBJECT_NAME,
+                extractSubItem(payload, getPayloadObjectName(), "string", "project", "id"),
+                trigger.equals(CANCELLING_EVENT_TRIGGER)));
     }
 
     @Override
-    public String getName() {
-        return EVENT_NAME;
+    public String getEventName() {
+        return EVENT_TRIGGER;
+    }
+
+    @Override
+    public String getCancellingEventName() {
+        return CANCELLING_EVENT_TRIGGER;
     }
 
     @Override

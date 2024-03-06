@@ -37,4 +37,6 @@ public class Event {
   String objectType;
 
   String projectId;
+
+  boolean isCancelling;
 }

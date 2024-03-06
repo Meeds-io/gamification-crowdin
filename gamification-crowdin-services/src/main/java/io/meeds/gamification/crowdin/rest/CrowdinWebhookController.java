@@ -4,14 +4,11 @@ import io.meeds.gamification.crowdin.services.CrowdinTriggerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -32,7 +29,6 @@ public class CrowdinWebhookController {
                                 @RequestHeader("authorization") String bearerToken,
                                 @RequestBody String payload) {
         try {
-            LOG.info("bearerToken: " + bearerToken);
             LOG.info("payload: " + payload);
             crowdinTriggerService.handleTriggerAsync(bearerToken, payload);
             return ResponseEntity.status(HttpStatus.OK).build();

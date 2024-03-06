@@ -14,9 +14,15 @@ public abstract class CrowdinTriggerPlugin extends BaseComponentPlugin {
      * @param payload payload The raw payload of the webhook request.
      * @return List of triggered events
      */
-    public abstract List<Event> getEvents(Map<String, Object> payload);
+    public abstract List<Event> getEvents(String trigger, Map<String, Object> payload);
 
-    public abstract String getName();
+    public abstract String getEventName();
+    public abstract String getCancellingEventName();
 
+    /**
+     * Gets json object event key name in the payload
+     *
+     * @return object name
+     */
     public abstract String getPayloadObjectName();
 }

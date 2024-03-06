@@ -32,7 +32,6 @@ import static io.meeds.gamification.crowdin.utils.Utils.*;
 public class CrowdinTriggerService {
 
     private static final Log LOG                = ExoLogger.getLogger(CrowdinTriggerService.class);
-
     private final Map<String, CrowdinTriggerPlugin> triggerPlugins = new HashMap<>();
 
     @Autowired
@@ -64,7 +63,6 @@ public class CrowdinTriggerService {
     @SuppressWarnings("unchecked")
     private void handleTrigger(String bearerToken, String payload) {
 
-        List<Event> events = new ArrayList<>();
         Map<String, Object> payloadMap = fromJsonStringToMap(payload);
 
         Object eventsObj = payloadMap.get("events");
@@ -96,14 +94,12 @@ public class CrowdinTriggerService {
                     continue;
                 }
 
-                events.addAll(triggerPlugin.getEvents(eventMap));
-                processEvents(events, projectId);
+                processEvents(triggerPlugin.getEvents(trigger, eventMap), projectId);
             }
         }
     }
 
     private void processEvents(List<Event> events, String projectId) {
-        LOG.info("processEvents: started");
         events.stream().filter(event -> isTriggerEnabled(event.getName(), projectId)).forEach(this::processEvent);
     }
 
@@ -138,26 +134,16 @@ public class CrowdinTriggerService {
             gam.put("objectId", event.getObjectId());
             gam.put("objectType", event.getObjectType());
             gam.put("eventDetails", eventDetails);
+            gam.put("ruleTitle", event.getName());
             LOG.info("processEvent: gam: " + gam);
-            List<EventDTO> eventDTOList = eventService.getEventsByTitle(event.getName(), 0, -1);
-            LOG.info("processEvent: eventDTOList: " + eventDTOList);
-            if (CollectionUtils.isNotEmpty(eventDTOList)) {
-                gam.put("ruleTitle", event.getName());
+            if ( ! event.isCancelling()) {
                 listenerService.broadcast(GAMIFICATION_GENERIC_EVENT, gam, "");
+                LOG.info("Crowdin action {} broadcast for user {}", event.getName(), senderId);
             } else {
-                List<EventDTO> events = eventService.getEvents(new EventFilter("crowdin", null), 0, 0);
-                List<EventDTO> eventsToCancel = events.stream()
-                        .filter(e -> e.getCancellerEvents() != null
-                                && e.getCancellerEvents().contains(event.getName()))
-                        .toList();
-                if (CollectionUtils.isNotEmpty(eventsToCancel)) {
-                    for (EventDTO eventToCancel : eventsToCancel) {
-                        gam.put("ruleTitle", eventToCancel.getTitle());
-                        listenerService.broadcast(GAMIFICATION_CANCEL_EVENT, gam, "");
-                    }
-                }
+                listenerService.broadcast(GAMIFICATION_CANCEL_EVENT, gam, "");
+                LOG.info("Crowdin cancelling action {} broadcast for user {}", event.getName(), senderId);
             }
-            LOG.info("Crowdin action {} broadcast for user {}", event.getName(), senderId);
+
         } catch (Exception e) {
             LOG.error("Cannot broadcast crowdin event", e);
         }
@@ -169,7 +155,8 @@ public class CrowdinTriggerService {
     }
 
     public void addPlugin(CrowdinTriggerPlugin crowdinTriggerPlugin) {
-        triggerPlugins.put(crowdinTriggerPlugin.getName(), crowdinTriggerPlugin);
+        triggerPlugins.put(crowdinTriggerPlugin.getEventName(), crowdinTriggerPlugin);
+        triggerPlugins.put(crowdinTriggerPlugin.getCancellingEventName(), crowdinTriggerPlugin);
     }
 
 }
