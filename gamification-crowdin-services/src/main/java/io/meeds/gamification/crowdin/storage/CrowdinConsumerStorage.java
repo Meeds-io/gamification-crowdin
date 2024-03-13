@@ -23,6 +23,7 @@ import io.meeds.gamification.crowdin.model.WebHook;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
@@ -47,9 +48,12 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static io.meeds.gamification.crowdin.utils.Utils.*;
 @Component
@@ -282,5 +286,86 @@ public class CrowdinConsumerStorage {
         } catch (CrowdinConnectionException e) {
             throw new IllegalStateException("Unable to delete Crowdin hook");
         }
+    }
+
+    public Map<Long, String> getProjectTranslationAuthors(
+            String projectId,
+            List<String> filterTranslationIds,
+            String accessToken) throws IllegalAccessException {
+
+        try {
+            StringBuilder query = new StringBuilder("{" +
+                    "  viewer {" +
+                    "    projects(first: 1, filter: {" +
+                    "      id: {equals: " + projectId + "}" );
+            query.append("}) { edges { node { translations ( first: ")
+                    .append(filterTranslationIds.size()).append(", filter: {\n").append("id: { equals: ")
+                    .append(filterTranslationIds.get(0)).append("},");
+
+            for(int i = 1; i < filterTranslationIds.size(); i++) {
+                query.append("or: {id: { equals: ").append(filterTranslationIds.get(i)).append("}, \n");
+            }
+            query.append("}".repeat(filterTranslationIds.size() - 1));
+
+            query.append("""
+                    }
+                              ) {
+                                totalCount
+                                edges {
+                                  node {
+                                    ... on PlainStringTranslation {
+                                      id
+                                      user {
+                                        username
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    """);
+
+            LOG.info("query : " + query);
+            URI uri = new URIBuilder(CROWDIN_GRAPHQL_API_URL)
+                    .addParameter("query", query.toString())
+                    .build();
+
+            String response = processGet(uri, accessToken);
+            LOG.info("response: " + response);
+
+            return extractTranslationIdUsername(response);
+        } catch (CrowdinConnectionException e) {
+            throw new IllegalAccessException("crowdin.tokenExpiredOrInvalid");
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Map<Long, String> extractTranslationIdUsername(String jsonString) {
+        Map<Long, String> translationIdUsernameMap = new HashMap<>();
+
+        JSONObject jsonObject = new JSONObject(jsonString);
+        JSONObject data = jsonObject.getJSONObject("data");
+        JSONObject viewer = data.getJSONObject("viewer");
+        JSONArray projectsEdges = viewer.getJSONObject("projects").getJSONArray("edges");
+
+        for (int i = 0; i < projectsEdges.length(); i++) {
+            JSONObject edge = projectsEdges.getJSONObject(i);
+            JSONObject node = edge.getJSONObject("node");
+            JSONObject translations = node.getJSONObject("translations");
+            JSONArray edges = translations.getJSONArray("edges");
+
+            for (int j = 0; j < edges.length(); j++) {
+                JSONObject translation = edges.getJSONObject(j).getJSONObject("node");
+                long id = translation.getLong("id");
+                String username = translation.getJSONObject("user").getString("username");
+                translationIdUsernameMap.put(id, username);
+            }
+        }
+        return translationIdUsernameMap;
     }
 }

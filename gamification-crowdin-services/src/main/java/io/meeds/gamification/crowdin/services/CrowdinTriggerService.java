@@ -4,13 +4,11 @@ import io.meeds.common.ContainerTransactional;
 import io.meeds.gamification.crowdin.model.Event;
 import io.meeds.gamification.crowdin.model.WebHook;
 import io.meeds.gamification.crowdin.plugin.CrowdinTriggerPlugin;
+import io.meeds.gamification.crowdin.storage.CrowdinConsumerStorage;
 import io.meeds.gamification.crowdin.storage.WebHookStorage;
-import io.meeds.gamification.model.EventDTO;
-import io.meeds.gamification.model.filter.EventFilter;
 import io.meeds.gamification.service.ConnectorService;
 import io.meeds.gamification.service.EventService;
 import io.meeds.gamification.service.TriggerService;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
@@ -21,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.meeds.gamification.crowdin.utils.Utils.*;
 
@@ -53,6 +48,9 @@ public class CrowdinTriggerService {
     private WebHookStorage webHookStorage;
 
     @Autowired
+    private CrowdinConsumerStorage crowdinConsumerStorage;
+
+    @Autowired
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     public void handleTriggerAsync(String bearerToken, String payload) {
@@ -68,7 +66,7 @@ public class CrowdinTriggerService {
         Object eventsObj = payloadMap.get("events");
         List<Map<String, Object>> eventsListMap = (List<Map<String, Object>>) eventsObj;
         LOG.info("Total Events: " + eventsListMap.size());
-
+        List<Map<String, Object>> projectTranslationsMapList = getTranslationAuthors(eventsListMap);
         for (Map<String, Object> eventMap: eventsListMap) {
             String trigger = extractSubItem(eventMap, "event");
             CrowdinTriggerPlugin triggerPlugin = getCrowdinTriggerPlugin(trigger);
@@ -94,7 +92,12 @@ public class CrowdinTriggerService {
                     continue;
                 }
 
-                processEvents(triggerPlugin.getEvents(trigger, eventMap), projectId);
+                Map<String, Object> projectTranslationAuthorsMap = projectTranslationsMapList.stream()
+                        .filter(map -> map.containsKey("projectId") && map.get("projectId").equals(projectId))
+                        .findFirst()
+                        .orElseGet(Collections::emptyMap);
+
+                processEvents(triggerPlugin.getEvents(trigger, eventMap, projectTranslationAuthorsMap), projectId);
             }
         }
     }
@@ -157,6 +160,41 @@ public class CrowdinTriggerService {
     public void addPlugin(CrowdinTriggerPlugin crowdinTriggerPlugin) {
         triggerPlugins.put(crowdinTriggerPlugin.getEventName(), crowdinTriggerPlugin);
         triggerPlugins.put(crowdinTriggerPlugin.getCancellingEventName(), crowdinTriggerPlugin);
+    }
+
+    public List<Map<String, Object>> getTranslationAuthors(List<Map<String, Object>> eventsListMap) {
+
+        List<Map<String, Object>> projectTranslationsMapList = new ArrayList<>();
+
+        List<String> projectIds = eventsListMap.stream()
+                .filter(map -> map.containsKey("event") && map.get("event").equals("suggestion.approved"))
+                .map(map -> extractSubItem(map, "translation", "string", "project", "id"))
+                .toList();
+
+        for (String projectId: projectIds) {
+
+            WebHook webHook = webHookStorage.getWebhookByProjectId(Long.parseLong(projectId));
+
+            List<String> translationIds = eventsListMap.stream()
+                    .filter(map -> map.containsKey("event") && map.get("event").equals("suggestion.approved"))
+                    .filter(map -> Objects.equals(extractSubItem(map, "translation", "string", "project", "id"), projectId))
+                    .map(map -> extractSubItem(map, "translation", "id"))
+                    .toList();
+
+            try {
+
+                Map<Long, String> translationIdUsernameMap = crowdinConsumerStorage.getProjectTranslationAuthors(projectId, translationIds, webHook.getToken());
+                Map<String, Object> projectTranslationAuthorsMap = new HashMap<>();
+                projectTranslationAuthorsMap.put("projectId", projectId);
+                projectTranslationAuthorsMap.put("translationIdUsernameMap", translationIdUsernameMap);
+                projectTranslationsMapList.add(projectTranslationAuthorsMap);
+
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return projectTranslationsMapList;
     }
 
 }
