@@ -31,7 +31,7 @@ public class SuggestionAddedTriggerPlugin extends CrowdinTriggerPlugin {
     }
 
     @Override
-    public List<Event> getEvents(String trigger, Map<String, Object> payload) {
+    public List<Event> getEvents(String trigger, Map<String, Object> payload, Object object) {
         if (extractSubItem(payload, getPayloadObjectName(), "provider") != null) {
             LOG.warn("Crowdin event {} translation provider is TM or MT", EVENT_TRIGGER);
             return Collections.emptyList();

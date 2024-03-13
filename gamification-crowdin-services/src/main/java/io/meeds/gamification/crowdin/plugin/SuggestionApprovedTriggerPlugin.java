@@ -8,7 +8,7 @@ import org.exoplatform.services.log.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -20,9 +20,7 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
     private static final Log LOG                = ExoLogger.getLogger(SuggestionAddedTriggerPlugin.class);
     protected String EVENT_PAYLOAD_OBJECT_NAME = "translation";
     protected String SUGGESTION_APPROVED_EVENT_TITLE =  "suggestionApproved";
-    protected String CANCELLING_SUGGESTION_APPROVED_EVENT_TITLE =  "suggestionDisapproved";
     protected String APPROVE_SUGGESTION_EVENT_TITLE =  "approveSuggestion";
-    protected String CANCELLING_APPROVE_SUGGESTION_EVENT_TITLE =  "disapproveSuggestion";
     protected String EVENT_TRIGGER =  "suggestion.approved";
     protected String CANCELLING_EVENT_TRIGGER =  "suggestion.disapproved";
 
@@ -34,20 +32,46 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
         crowdinTriggerService.addPlugin(this);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public List<Event> getEvents(String trigger, Map<String, Object> payload) {
+    public List<Event> getEvents(String trigger, Map<String, Object> payload, Object object) {
         if (extractSubItem(payload, getPayloadObjectName(), "provider") != null) {
             LOG.warn("Crowdin event {} translation provider is TM or MT", EVENT_TRIGGER);
             return Collections.emptyList();
         }
 
-        return Collections.singletonList(new Event(SUGGESTION_APPROVED_EVENT_TITLE,
-                null,
+        List<Event> eventList = new ArrayList<>();
+        eventList.add(new Event(APPROVE_SUGGESTION_EVENT_TITLE,
+                extractSubItem(payload, getPayloadObjectName(), "user", "username"),
                 extractSubItem(payload, getPayloadObjectName(), "user", "username"),
                 extractSubItem(payload, getPayloadObjectName(), "id"),
                 EVENT_PAYLOAD_OBJECT_NAME,
                 extractSubItem(payload, getPayloadObjectName(), "string", "project", "id"),
                 trigger.equals(CANCELLING_EVENT_TRIGGER)));
+
+        if (object == null) {
+            return eventList;
+        }
+
+        Map<String, Object> translationAuthorsMap = (Map<String, Object>) object;
+        LOG.debug("translationAuthorsMap size: " + translationAuthorsMap.size());
+        Map<Long, String> translationsAuthors = (Map<Long, String>) translationAuthorsMap.get("translationIdUsernameMap");
+        String translationId = extractSubItem(payload, getPayloadObjectName(), "id");
+        if (translationId != null) {
+            String authorUsername = translationsAuthors.get(Long.parseLong(translationId));
+
+            if (authorUsername != null) {
+                eventList.add(new Event(SUGGESTION_APPROVED_EVENT_TITLE,
+                        authorUsername,
+                        authorUsername,
+                        extractSubItem(payload, getPayloadObjectName(), "id"),
+                        EVENT_PAYLOAD_OBJECT_NAME,
+                        extractSubItem(payload, getPayloadObjectName(), "string", "project", "id"),
+                        trigger.equals(CANCELLING_EVENT_TRIGGER)));
+            }
+        }
+
+        return eventList;
     }
 
     @Override
