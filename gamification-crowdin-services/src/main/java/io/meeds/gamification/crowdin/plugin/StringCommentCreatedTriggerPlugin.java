@@ -29,7 +29,7 @@ public class StringCommentCreatedTriggerPlugin extends CrowdinTriggerPlugin {
     }
 
     @Override
-    public List<Event> getEvents(String trigger, Map<String, Object> payload) {
+    public List<Event> getEvents(String trigger, Map<String, Object> payload, Object object) {
         return Collections.singletonList(new Event(EVENT_TITLE,
                 extractSubItem(payload, getPayloadObjectName(), "user", "username"),
                 extractSubItem(payload, getPayloadObjectName(), "user", "username"),

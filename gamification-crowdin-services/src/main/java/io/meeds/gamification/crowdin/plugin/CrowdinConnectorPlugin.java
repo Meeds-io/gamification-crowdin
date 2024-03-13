@@ -80,7 +80,7 @@ public class CrowdinConnectorPlugin extends ConnectorPlugin {
         OAuth2AccessToken oAuth2AccessToken = getOAuthService(remoteConnectorSettings).getAccessToken(code);
         //CrowdinAccessTokenContext accessTokenContext = new CrowdinAccessTokenContext(oAuth2AccessToken);
         String crowdinIdentifier = fetchUsernameFromAccessToken(oAuth2AccessToken.getAccessToken());
-        LOG.info("validateToken: crowdinIdentifier: " + crowdinIdentifier);
+
         if (StringUtils.isBlank(crowdinIdentifier)) {
           throw new OAuthException(OAuthExceptionCode.INVALID_STATE, "User Crowdin identifier is empty");
         }
