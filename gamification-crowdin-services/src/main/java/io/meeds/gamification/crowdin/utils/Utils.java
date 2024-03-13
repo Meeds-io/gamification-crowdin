@@ -12,20 +12,21 @@ import java.security.SecureRandom;
 import java.util.Map;
 
 public class Utils {
-    private static final Log LOG                                        = ExoLogger.getLogger(Utils.class);
-    public static final String  CONNECTOR_NAME                             = "crowdin";
+    private static final Log LOG                                      = ExoLogger.getLogger(Utils.class);
+    public static final String  CONNECTOR_NAME                        = "crowdin";
     public static final String  PROJECT_ID                            = "projectId";
-    public static final String  CROWDIN_CONNECTION_ERROR                    = "crowdin.connectionError";
-    public static final String  AUTHORIZATION                              = "Authorization";
-    public static final String  TOKEN                                      = "Bearer ";
-    public static final String  CROWDIN_API_URL                             = "https://api.crowdin.com/api/v2";
+    public static final String  CROWDIN_CONNECTION_ERROR              = "crowdin.connectionError";
+    public static final String  AUTHORIZATION                         = "Authorization";
+    public static final String  TOKEN                                 = "Bearer ";
+    public static final String  CROWDIN_API_URL                       = "https://api.crowdin.com/api/v2";
+    public static final String  CROWDIN_GRAPHQL_API_URL               = "https://api.crowdin.com/api/graphql";
     public static final String  PROJECTS                              = "/projects/";
     public static final String  WEBHOOKS                              = "/webhooks/";
-    public static final String  AUTHORIZED_TO_ACCESS_CROWDIN_HOOKS         = "The user is not authorized to access crowdin Hooks";
+    public static final String  AUTHORIZED_TO_ACCESS_CROWDIN_HOOKS    = "The user is not authorized to access crowdin Hooks";
 
-    public static final String    GAMIFICATION_GENERIC_EVENT = "exo.gamification.generic.action";
+    public static final String    GAMIFICATION_GENERIC_EVENT          = "exo.gamification.generic.action";
 
-    public static final String    GAMIFICATION_CANCEL_EVENT  = "gamification.cancel.event.action";
+    public static final String    GAMIFICATION_CANCEL_EVENT           = "gamification.cancel.event.action";
 
     public static String encode(String token) {
         try {

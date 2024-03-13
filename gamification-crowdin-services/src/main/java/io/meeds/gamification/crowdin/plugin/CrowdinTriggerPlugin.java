@@ -11,10 +11,14 @@ public abstract class CrowdinTriggerPlugin extends BaseComponentPlugin {
     /**
      * Gets List of triggered events
      *
-     * @param payload payload The raw payload of the webhook request.
+     * @param payload                      payload The raw payload of the webhook request.
+     * @param object                       additional processing object
      * @return List of triggered events
      */
-    public abstract List<Event> getEvents(String trigger, Map<String, Object> payload);
+    public abstract List<Event> getEvents(
+            String trigger,
+            Map<String, Object> payload,
+            Object object);
 
     public abstract String getEventName();
     public abstract String getCancellingEventName();
