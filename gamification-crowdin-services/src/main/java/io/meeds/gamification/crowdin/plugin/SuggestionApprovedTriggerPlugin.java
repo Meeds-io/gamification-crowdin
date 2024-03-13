@@ -54,11 +54,12 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
         }
 
         Map<String, Object> translationAuthorsMap = (Map<String, Object>) object;
+        LOG.debug("translationAuthorsMap size: " + translationAuthorsMap.size());
         Map<Long, String> translationsAuthors = (Map<Long, String>) translationAuthorsMap.get("translationIdUsernameMap");
         String translationId = extractSubItem(payload, getPayloadObjectName(), "id");
         if (translationId != null) {
             String authorUsername = translationsAuthors.get(Long.parseLong(translationId));
-            LOG.info("authorUsername: "  + authorUsername);
+
             if (authorUsername != null) {
                 eventList.add(new Event(SUGGESTION_APPROVED_EVENT_TITLE,
                         authorUsername,

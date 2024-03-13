@@ -117,12 +117,7 @@ public class CrowdinConsumerStorage {
             headers.put("Authorization", "Bearer " + secret);
             requestJson.put("headers", headers);
 
-            LOG.info("requestJson : " + requestJson);
-            LOG.info("uri : " + uri);
-
             String response = processPost(uri, requestJson.toString(), accessToken);
-
-            LOG.info("response : " + response);
 
             JSONObject responseJson = new JSONObject(response);
 
@@ -329,13 +324,11 @@ public class CrowdinConsumerStorage {
                     }
                     """);
 
-            LOG.info("query : " + query);
             URI uri = new URIBuilder(CROWDIN_GRAPHQL_API_URL)
                     .addParameter("query", query.toString())
                     .build();
 
             String response = processGet(uri, accessToken);
-            LOG.info("response: " + response);
 
             return extractTranslationIdUsername(response);
         } catch (CrowdinConnectionException e) {
