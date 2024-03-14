@@ -207,8 +207,6 @@ export default {
   methods: {
     open(hook) {
       if (hook) {
-        console.log('hook:');
-        console.log(hook);
         this.hook = hook;
         this.projectId = hook?.projectId || null;
         this.accessTokenInput = '*'.repeat(8);
