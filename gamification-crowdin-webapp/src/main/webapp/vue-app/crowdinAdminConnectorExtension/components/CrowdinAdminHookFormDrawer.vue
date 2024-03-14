@@ -207,10 +207,13 @@ export default {
   methods: {
     open(hook) {
       if (hook) {
+        console.log('hook:');
+        console.log(hook);
         this.hook = hook;
-        this.projectId = hook?.id || null;
+        this.projectId = hook?.projectId || null;
         this.accessTokenInput = '*'.repeat(8);
         this.accessTokenStored = true;
+        this.getProjects(hook?.id || null);
       } else {
         this.accessTokenInput = null;
         this.isTokenEditing = true;
@@ -232,8 +235,8 @@ export default {
         return this.$crowdinConnectorService.saveCrowdinWebHook(project, this.accessToken).then(() => {
           this.$root.$emit('crowdin-hooks-updated');
           this.close();
-        }).catch(e => {
-          this.displayNotificationAlert(e.message, 'error');
+        }).catch(error => {
+          this.displayNotificationAlert(error.message, 'error');
         }).finally(() => this.loading = false);
       } else {
         return this.$crowdinConnectorService.updateWebHookAccessToken(this.hookId, this.accessToken).then(() => {
@@ -261,9 +264,9 @@ export default {
         });
       }
     },
-    getProjects() {
+    getProjects(hookId) {
       this.isFetchingProjects = true;
-      return this.$crowdinConnectorService.getProjects(this.accessToken)
+      return this.$crowdinConnectorService.getProjects(this.accessToken, hookId)
         .then(projects => {
           this.projects = projects;
         })

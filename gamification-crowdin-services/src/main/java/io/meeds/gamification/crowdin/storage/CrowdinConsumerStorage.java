@@ -66,7 +66,7 @@ public class CrowdinConsumerStorage {
     public List<RemoteProject> getProjects(String accessToken) throws IllegalAccessException {
         try {
 
-            URI uri = URI.create(CROWDIN_API_URL + PROJECTS);
+            URI uri = URI.create(CROWDIN_API_URL + PROJECTS + "?hasManagerAccess=1");
             String response = processGet(uri, accessToken);
             JSONArray jsonArray = new JSONObject(response).getJSONArray("data");
 

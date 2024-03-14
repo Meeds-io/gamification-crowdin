@@ -44,7 +44,7 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
         eventList.add(new Event(APPROVE_SUGGESTION_EVENT_TITLE,
                 extractSubItem(payload, getPayloadObjectName(), "user", "username"),
                 extractSubItem(payload, getPayloadObjectName(), "user", "username"),
-                extractSubItem(payload, getPayloadObjectName(), "id"),
+                extractSubItem(payload, getPayloadObjectName(), "string", "url"),
                 EVENT_PAYLOAD_OBJECT_NAME,
                 extractSubItem(payload, getPayloadObjectName(), "string", "project", "id"),
                 trigger.equals(CANCELLING_EVENT_TRIGGER)));
@@ -64,7 +64,7 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
                 eventList.add(new Event(SUGGESTION_APPROVED_EVENT_TITLE,
                         authorUsername,
                         authorUsername,
-                        extractSubItem(payload, getPayloadObjectName(), "id"),
+                        extractSubItem(payload, getPayloadObjectName(), "string", "url"),
                         EVENT_PAYLOAD_OBJECT_NAME,
                         extractSubItem(payload, getPayloadObjectName(), "string", "project", "id"),
                         trigger.equals(CANCELLING_EVENT_TRIGGER)));

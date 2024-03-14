@@ -57,6 +57,14 @@ public class WebhookService {
             "suggestion.added", "suggestion.deleted", "suggestion.approved", "suggestion.disapproved"};
 
 
+    public List<RemoteProject> getProjectsFromWebhookId(long webHookId) throws IllegalAccessException, ObjectNotFoundException {
+        WebHook webHook = webHookStorage.getWebHookById(webHookId);
+        if (webHook == null) {
+            throw new ObjectNotFoundException("webhook with id : " + webHookId + " wasn't found");
+        }
+        return crowdinConsumerStorage.getProjects(webHook.getToken());
+    }
+
     public List<RemoteProject> getProjects(String accessToken) throws IllegalAccessException {
         return crowdinConsumerStorage.getProjects(accessToken);
     }

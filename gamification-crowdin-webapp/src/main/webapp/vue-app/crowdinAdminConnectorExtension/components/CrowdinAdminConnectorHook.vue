@@ -179,6 +179,9 @@ export default {
         event.preventDefault();
         event.stopPropagation();
       }
+      console.log('editCrowdinWebHook');
+      console.log('this.hook:');
+      console.log(this.hook);
       this.$root.$emit('crowdin-hook-form-drawer', this.hook);
     },
     openHookDetail() {

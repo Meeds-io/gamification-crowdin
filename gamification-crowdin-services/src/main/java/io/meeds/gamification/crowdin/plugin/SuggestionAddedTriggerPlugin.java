@@ -40,7 +40,7 @@ public class SuggestionAddedTriggerPlugin extends CrowdinTriggerPlugin {
         return Collections.singletonList(new Event(EVENT_TITLE,
                 extractSubItem(payload, getPayloadObjectName(), "user", "username"),
                 extractSubItem(payload, getPayloadObjectName(), "user", "username"),
-                extractSubItem(payload, getPayloadObjectName(), "id"),
+                extractSubItem(payload, getPayloadObjectName(), "string", "url"),
                 EVENT_PAYLOAD_OBJECT_NAME,
                 extractSubItem(payload, getPayloadObjectName(), "string", "project", "id"),
                 trigger.equals(CANCELLING_EVENT_TRIGGER)));
