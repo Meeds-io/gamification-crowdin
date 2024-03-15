@@ -1,6 +1,7 @@
 package io.meeds.gamification.crowdin.plugin;
 
 import io.meeds.gamification.crowdin.model.Event;
+import io.meeds.gamification.crowdin.model.RemoteTranslation;
 import io.meeds.gamification.crowdin.services.CrowdinTriggerService;
 import jakarta.annotation.PostConstruct;
 import org.exoplatform.services.log.ExoLogger;
@@ -53,17 +54,24 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
             return eventList;
         }
 
-        Map<String, Object> translationAuthorsMap = (Map<String, Object>) object;
-        LOG.debug("translationAuthorsMap size: " + translationAuthorsMap.size());
-        Map<Long, String> translationsAuthors = (Map<Long, String>) translationAuthorsMap.get("translationIdUsernameMap");
+        List<RemoteTranslation> remoteTranslations = (List<RemoteTranslation>) object;
+        LOG.debug("remoteTranslations: " + remoteTranslations.size());
         String translationId = extractSubItem(payload, getPayloadObjectName(), "id");
         if (translationId != null) {
-            String authorUsername = translationsAuthors.get(Long.parseLong(translationId));
 
-            if (authorUsername != null) {
+            RemoteTranslation translationById = null;
+
+            for (RemoteTranslation translation : remoteTranslations) {
+                if (translation.getId() == Long.parseLong(translationId)) {
+                    translationById = translation;
+                    break;
+                }
+            }
+
+            if (translationById != null) {
                 eventList.add(new Event(SUGGESTION_APPROVED_EVENT_TITLE,
-                        authorUsername,
-                        authorUsername,
+                        translationById.getUsername(),
+                        translationById.getUsername(),
                         extractSubItem(payload, getPayloadObjectName(), "string", "url"),
                         EVENT_PAYLOAD_OBJECT_NAME,
                         extractSubItem(payload, getPayloadObjectName(), "string", "project", "id"),
@@ -87,5 +95,10 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
     @Override
     public String getPayloadObjectName() {
         return EVENT_PAYLOAD_OBJECT_NAME;
+    }
+
+    @Override
+    public boolean batchQueryRemoteTranslations() {
+        return true;
     }
 }

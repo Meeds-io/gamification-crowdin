@@ -60,4 +60,9 @@ public class SuggestionAddedTriggerPlugin extends CrowdinTriggerPlugin {
     public String getPayloadObjectName() {
         return EVENT_PAYLOAD_OBJECT_NAME;
     }
+
+    @Override
+    public boolean batchQueryRemoteTranslations() {
+        return false;
+    }
 }

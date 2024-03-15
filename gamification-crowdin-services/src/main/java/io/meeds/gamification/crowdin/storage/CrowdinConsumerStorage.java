@@ -19,6 +19,7 @@ package io.meeds.gamification.crowdin.storage;
 
 import io.meeds.gamification.crowdin.exception.CrowdinConnectionException;
 import io.meeds.gamification.crowdin.model.RemoteProject;
+import io.meeds.gamification.crowdin.model.RemoteTranslation;
 import io.meeds.gamification.crowdin.model.WebHook;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
@@ -51,9 +52,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static io.meeds.gamification.crowdin.utils.Utils.*;
 @Component
@@ -283,7 +282,7 @@ public class CrowdinConsumerStorage {
         }
     }
 
-    public Map<Long, String> getProjectTranslationAuthors(
+    public List<RemoteTranslation> getProjectFilteredRemoteTranslations(
             String projectId,
             List<String> filterTranslationIds,
             String accessToken) throws IllegalAccessException {
@@ -330,7 +329,7 @@ public class CrowdinConsumerStorage {
 
             String response = processGet(uri, accessToken);
 
-            return extractTranslationIdUsername(response);
+            return extractTranslations(response, projectId);
         } catch (CrowdinConnectionException e) {
             throw new IllegalAccessException("crowdin.tokenExpiredOrInvalid");
         } catch (URISyntaxException e) {
@@ -338,8 +337,8 @@ public class CrowdinConsumerStorage {
         }
     }
 
-    private static Map<Long, String> extractTranslationIdUsername(String jsonString) {
-        Map<Long, String> translationIdUsernameMap = new HashMap<>();
+    private static List<RemoteTranslation> extractTranslations(String jsonString, String projectId) {
+        List<RemoteTranslation> remoteTranslationList = new ArrayList<>();
 
         JSONObject jsonObject = new JSONObject(jsonString);
         JSONObject data = jsonObject.getJSONObject("data");
@@ -353,12 +352,17 @@ public class CrowdinConsumerStorage {
             JSONArray edges = translations.getJSONArray("edges");
 
             for (int j = 0; j < edges.length(); j++) {
-                JSONObject translation = edges.getJSONObject(j).getJSONObject("node");
-                long id = translation.getLong("id");
-                String username = translation.getJSONObject("user").getString("username");
-                translationIdUsernameMap.put(id, username);
+                JSONObject translationJSON = edges.getJSONObject(j).getJSONObject("node");
+                long id = translationJSON.getLong("id");
+                String username = translationJSON.getJSONObject("user").getString("username");
+
+                RemoteTranslation translation = new RemoteTranslation();
+                translation.setId(id);
+                translation.setProjectId(projectId);
+                translation.setUsername(username);
+                remoteTranslationList.add(translation);
             }
         }
-        return translationIdUsernameMap;
+        return remoteTranslationList;
     }
 }
