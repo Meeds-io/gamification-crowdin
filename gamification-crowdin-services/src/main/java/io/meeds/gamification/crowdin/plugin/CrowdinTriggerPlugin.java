@@ -29,4 +29,5 @@ public abstract class CrowdinTriggerPlugin extends BaseComponentPlugin {
      * @return object name
      */
     public abstract String getPayloadObjectName();
+    public abstract boolean batchQueryRemoteTranslations();
 }

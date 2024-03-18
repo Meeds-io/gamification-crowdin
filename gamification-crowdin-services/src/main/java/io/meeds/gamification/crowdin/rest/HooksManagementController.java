@@ -48,7 +48,6 @@ import static io.meeds.gamification.utils.Utils.getCurrentUser;
 @RequestMapping("/crowdin/hooks")
 @Tag(name = "hooks", description = "An endpoint to manage crowdin webhooks")
 public class HooksManagementController {
-
     public static final String         CROWDIN_HOOK_NOT_FOUND = "The Crowdin hook doesn't exit";
 
     @Autowired
@@ -119,17 +118,22 @@ public class HooksManagementController {
     @ApiResponse(responseCode = "400", description = "Bad request")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
     @ApiResponse(responseCode = "503", description = "Service unavailable")
-    public List<RemoteProject> getProjects(@Parameter(description = "WebHook technical identifier", required = true) @RequestParam("accessToken") String accessToken) {
-        if (accessToken.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Access Token must be not empty");
-        }
-
+    public List<RemoteProject> getProjects(
+            @Parameter(description = "Crowdin access token") @RequestParam("accessToken") String accessToken,
+            @Parameter(description = "WebHook technical identifier") @RequestParam("hookId") String webHookId
+    ) {
         try {
-            return webhookService.getProjects(accessToken);
+            if (webHookId != null && !webHookId.isEmpty()) {
+                return webhookService.getProjectsFromWebhookId(Long.parseLong(webHookId));
+            } else {
+                return webhookService.getProjects(accessToken);
+            }
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (IllegalAccessException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        } catch (ObjectNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
 

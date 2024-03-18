@@ -2,6 +2,7 @@ package io.meeds.gamification.crowdin.services;
 
 import io.meeds.common.ContainerTransactional;
 import io.meeds.gamification.crowdin.model.Event;
+import io.meeds.gamification.crowdin.model.RemoteTranslation;
 import io.meeds.gamification.crowdin.model.WebHook;
 import io.meeds.gamification.crowdin.plugin.CrowdinTriggerPlugin;
 import io.meeds.gamification.crowdin.storage.CrowdinConsumerStorage;
@@ -66,7 +67,9 @@ public class CrowdinTriggerService {
         Object eventsObj = payloadMap.get("events");
         List<Map<String, Object>> eventsListMap = (List<Map<String, Object>>) eventsObj;
         LOG.info("Total Events: " + eventsListMap.size());
-        List<Map<String, Object>> projectTranslationsMapList = getTranslationAuthors(eventsListMap);
+
+        List<RemoteTranslation> remoteTranslationList = getBatchRemoteTranslations(eventsListMap);
+
         for (Map<String, Object> eventMap: eventsListMap) {
             String trigger = extractSubItem(eventMap, "event");
             CrowdinTriggerPlugin triggerPlugin = getCrowdinTriggerPlugin(trigger);
@@ -92,12 +95,11 @@ public class CrowdinTriggerService {
                     continue;
                 }
 
-                Map<String, Object> projectTranslationAuthorsMap = projectTranslationsMapList.stream()
-                        .filter(map -> map.containsKey("projectId") && map.get("projectId").equals(projectId))
-                        .findFirst()
-                        .orElseGet(Collections::emptyMap);
+                List<RemoteTranslation> filteredList = remoteTranslationList.stream()
+                        .filter(translation -> translation.getProjectId() .equals(projectId))
+                        .toList();
 
-                processEvents(triggerPlugin.getEvents(trigger, eventMap, projectTranslationAuthorsMap), projectId);
+                processEvents(triggerPlugin.getEvents(trigger, eventMap, filteredList), projectId);
             }
         }
     }
@@ -162,39 +164,54 @@ public class CrowdinTriggerService {
         triggerPlugins.put(crowdinTriggerPlugin.getCancellingEventName(), crowdinTriggerPlugin);
     }
 
-    public List<Map<String, Object>> getTranslationAuthors(List<Map<String, Object>> eventsListMap) {
+    public List<RemoteTranslation> getBatchRemoteTranslations(
+            List<Map<String, Object>> eventsListMap) {
 
-        List<Map<String, Object>> projectTranslationsMapList = new ArrayList<>();
+        List<RemoteTranslation> remoteTranslationList = new ArrayList<>();
 
-        List<String> projectIds = eventsListMap.stream()
-                .filter(map -> map.containsKey("event") && map.get("event").equals("suggestion.approved"))
-                .map(map -> extractSubItem(map, "translation", "string", "project", "id"))
-                .toList();
+        for (Map.Entry<String, CrowdinTriggerPlugin> entry : triggerPlugins.entrySet()) {
 
-        for (String projectId: projectIds) {
+            CrowdinTriggerPlugin crowdinTriggerPlugin = entry.getValue();
 
-            WebHook webHook = webHookStorage.getWebhookByProjectId(Long.parseLong(projectId));
+            if (! crowdinTriggerPlugin.batchQueryRemoteTranslations()) {
+                continue;
+            }
 
-            List<String> translationIds = eventsListMap.stream()
-                    .filter(map -> map.containsKey("event") && map.get("event").equals("suggestion.approved"))
-                    .filter(map -> Objects.equals(extractSubItem(map, "translation", "string", "project", "id"), projectId))
-                    .map(map -> extractSubItem(map, "translation", "id"))
+            List<String> projectIds = eventsListMap.stream()
+                    .filter(map -> map.containsKey("event") && map.get("event").equals(crowdinTriggerPlugin.getEventName()))
+                    .map(map -> extractSubItem(map, crowdinTriggerPlugin.getPayloadObjectName(), "string", "project", "id"))
+                    .filter(Objects::nonNull)
+                    .distinct()
                     .toList();
 
-            try {
+            for (String projectId : projectIds) {
 
-                Map<Long, String> translationIdUsernameMap = crowdinConsumerStorage.getProjectTranslationAuthors(projectId, translationIds, webHook.getToken());
-                Map<String, Object> projectTranslationAuthorsMap = new HashMap<>();
-                projectTranslationAuthorsMap.put("projectId", projectId);
-                projectTranslationAuthorsMap.put("translationIdUsernameMap", translationIdUsernameMap);
-                projectTranslationsMapList.add(projectTranslationAuthorsMap);
+                WebHook webHook = webHookStorage.getWebhookByProjectId(Long.parseLong(projectId));
 
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                List<String> translationIds = eventsListMap.stream()
+                        .filter(map -> map.containsKey("event") && map.get("event").equals(crowdinTriggerPlugin.getEventName()))
+                        .filter(map -> Objects.equals(extractSubItem(map,
+                                crowdinTriggerPlugin.getPayloadObjectName(), "string", "project", "id"), projectId))
+                        .map(map -> extractSubItem(map, crowdinTriggerPlugin.getPayloadObjectName(), "id"))
+                        .filter(Objects::nonNull)
+                        .distinct()
+                        .toList();
+
+                try {
+
+                    remoteTranslationList.addAll(
+                            crowdinConsumerStorage.getProjectFilteredRemoteTranslations(
+                                    projectId, translationIds, webHook.getToken()
+                            )
+                    );
+
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
 
-        return projectTranslationsMapList;
+        return remoteTranslationList;
     }
 
 }
