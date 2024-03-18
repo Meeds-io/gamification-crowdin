@@ -15,17 +15,16 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-export function getProjects(accessToken) {
-  return fetch(`/gamification-crowdin/rest/crowdin/hooks/get-projects?accessToken=${accessToken}`, {
+export function getProjects(accessToken, hookId) {
+  return fetch(`/gamification-crowdin/rest/crowdin/hooks/get-projects?accessToken=${accessToken || ''}&hookId=${hookId || ''}`  , {
     method: 'GET',
     credentials: 'include',
   }).then((resp) => {
     if (resp?.ok) {
       return resp.json();
     } else if (resp.status === 404 || resp.status === 401) {
-      return resp.text().then((text) => {
-        console.log(text);
-        throw new Error(text);
+      return resp.json().then((data) => {
+        throw new Error(data.message);
       });
     } else {
       throw new Error('Error when getting crowdin projects');
@@ -75,8 +74,8 @@ export function saveCrowdinWebHook(project, accessToken) {
   }).then(resp => {
     if (!resp?.ok) {
       if (resp.status === 404 || resp.status === 401) {
-        return resp.text().then((text) => {
-          throw new Error(text);
+        return resp.json().then((data) => {
+          throw new Error(data.message);
         });
       } else {
         throw new Error('Error when saving crowdin webhook');
@@ -110,57 +109,6 @@ export function deleteCrowdinWebHook(projectId) {
   }).then(resp => {
     if (!resp?.ok) {
       throw new Error('Error when deleting crowdin webhook');
-    }
-  });
-}
-
-export function getWebHookRepos(projectId, page, perPage, keyword) {
-  return fetch(`/gamification-crowdin/rest/crowdin/hooks/${projectId}/repos?page=${page || 0}&perPage=${perPage|| 10}&keyword=${keyword || ''}`, {
-    method: 'GET',
-    credentials: 'include',
-  }).then((resp) => {
-    if (resp?.ok) {
-      return resp.json();
-    } else {
-      throw new Error('Error when getting crowdin webhooks');
-    }
-  });
-}
-
-export function saveRepositoryStatus(repositoryId, projectId, enabled) {
-  const formData = new FormData();
-  formData.append('repositoryId', repositoryId);
-  formData.append('projectId', projectId);
-  formData.append('enabled', enabled);
-
-  return fetch('/gamification-crowdin/rest/crowdin/hooks/repo/status', {
-    method: 'POST',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams(formData).toString(),
-  }).then(resp => {
-    if (!resp?.ok) {
-      throw new Error('Response code indicates a server error', resp);
-    }
-  });
-}
-
-export function enableDisableWatchScope(projectId, enabled) {
-  const formData = new FormData();
-  formData.append('projectId', projectId);
-  formData.append('enabled', enabled);
-  return fetch('/gamification-crowdin/rest/crowdin/hooks/watchScope/status', {
-    method: 'POST',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams(formData).toString(),
-  }).then(resp => {
-    if (!resp?.ok) {
-      throw new Error('Response code indicates a server error', resp);
     }
   });
 }
