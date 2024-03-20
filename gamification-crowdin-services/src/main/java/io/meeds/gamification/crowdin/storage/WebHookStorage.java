@@ -79,10 +79,6 @@ public class WebHookStorage {
     return webHookDAO.getWebhookIds(offset, limit);
   }
 
-  public int countWebhooks() {
-    return webHookDAO.count().intValue();
-  }
-
   public WebHook getWebhookByProjectId(long projectId) {
     WebhookEntity connectorHookEntity = webHookDAO.getWebhookByProjectId(projectId);
     return fromEntity(connectorHookEntity);

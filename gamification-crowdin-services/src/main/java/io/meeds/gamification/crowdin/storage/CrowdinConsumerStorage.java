@@ -18,9 +18,7 @@
 package io.meeds.gamification.crowdin.storage;
 
 import io.meeds.gamification.crowdin.exception.CrowdinConnectionException;
-import io.meeds.gamification.crowdin.model.RemoteProject;
-import io.meeds.gamification.crowdin.model.RemoteTranslation;
-import io.meeds.gamification.crowdin.model.WebHook;
+import io.meeds.gamification.crowdin.model.*;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -242,7 +240,7 @@ public class CrowdinConsumerStorage {
         // implemented in cached storage
     }
 
-    public RemoteProject retrieveRemoteProject(long projectRemoteId, String accessToken) throws IllegalAccessException {
+    public RemoteProject retrieveRemoteProject(long projectRemoteId, boolean includeLanguages, String accessToken) throws IllegalAccessException {
         try {
 
             URI uri = URI.create(CROWDIN_API_URL + PROJECTS + projectRemoteId);
@@ -250,7 +248,7 @@ public class CrowdinConsumerStorage {
             if (response == null) {
                 return null;
             }
-            return getRemoteProject(response);
+            return getRemoteProject(response, includeLanguages);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(e);
         } catch (CrowdinConnectionException e) {
@@ -258,7 +256,7 @@ public class CrowdinConsumerStorage {
         }
     }
 
-    private static RemoteProject getRemoteProject(String response) {
+    private static RemoteProject getRemoteProject(String response, boolean includeLanguages) {
         JSONObject responseJson = new JSONObject(response);
         JSONObject jsonObject = responseJson.getJSONObject("data");
 
@@ -268,6 +266,19 @@ public class CrowdinConsumerStorage {
         project.setIdentifier(jsonObject.getString("identifier"));
         if(jsonObject.get("logo") instanceof String) {
             project.setAvatarUrl(jsonObject.getString("logo"));
+        }
+
+        if (includeLanguages) {
+            JSONArray languages = jsonObject.getJSONArray("targetLanguages");
+            List<RemoteLanguage> remoteLanguages = new ArrayList<>();
+            for (int i = 0; i < languages.length(); i++) {
+                JSONObject language = languages.getJSONObject(i);
+                RemoteLanguage remoteLanguage = new RemoteLanguage();
+                remoteLanguage.setId(language.getString("id"));
+                remoteLanguage.setName(language.getString("name"));
+                remoteLanguages.add(remoteLanguage);
+            }
+            project.setLanguages(remoteLanguages);
         }
         
         return project;
@@ -364,5 +375,38 @@ public class CrowdinConsumerStorage {
             }
         }
         return remoteTranslationList;
+    }
+
+    public List<RemoteDirectory> getProjectDirectories(
+            long remoteProjectId, int offset, int limit, String accessToken
+    ) throws IllegalAccessException {
+        try {
+
+            URI uri = URI.create(
+                    CROWDIN_API_URL + PROJECTS + remoteProjectId + "/directories?offset=" + offset + "&limit=" + limit);
+            String response = processGet(uri, accessToken);
+            JSONArray jsonArray = new JSONObject(response).getJSONArray("data");
+
+            List<RemoteDirectory> directories = new ArrayList<>();
+
+            // loop through the array and parse the projects
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObjectData = jsonArray.getJSONObject(i);
+                JSONObject jsonObject = jsonObjectData.getJSONObject("data");
+                // parse the project
+                RemoteDirectory directory = new RemoteDirectory();
+                directory.setId(jsonObject.getInt("id"));
+                directory.setProjectId(jsonObject.getLong("projectId"));
+                directory.setPath(jsonObject.getString("path"));
+
+                directories.add(directory);
+            }
+
+            return directories;
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(e);
+        } catch (CrowdinConnectionException e) {
+            throw new IllegalAccessException("crowdin.tokenExpiredOrInvalid");
+        }
     }
 }

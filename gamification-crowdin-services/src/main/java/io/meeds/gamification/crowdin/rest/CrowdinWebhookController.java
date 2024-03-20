@@ -17,8 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 @Tag(name = "webhooks", description = "An endpoint to receive crowdin webhooks")
 public class CrowdinWebhookController {
 
-    private static final Log LOG                = ExoLogger.getLogger(CrowdinWebhookController.class);
-
     @Autowired
     private CrowdinTriggerService crowdinTriggerService;
     @PostMapping
@@ -29,7 +27,6 @@ public class CrowdinWebhookController {
                                 @RequestHeader("authorization") String bearerToken,
                                 @RequestBody String payload) {
         try {
-            LOG.info("payload: " + payload);
             crowdinTriggerService.handleTriggerAsync(bearerToken, payload);
             return ResponseEntity.status(HttpStatus.OK).build();
         } catch (Exception e) {

@@ -17,6 +17,7 @@
  */
 package io.meeds.gamification.crowdin.rest;
 
+import io.meeds.gamification.crowdin.model.RemoteDirectory;
 import io.meeds.gamification.crowdin.model.RemoteProject;
 import io.meeds.gamification.crowdin.model.WebHook;
 import io.meeds.gamification.crowdin.rest.builder.WebHookBuilder;
@@ -65,17 +66,13 @@ public class HooksManagementController {
     @ApiResponse(responseCode = "503", description = "Service unavailable")
     public List<WebHookRestEntity> getWebHooks(@RequestParam("offset") int offset,
                                                @Parameter(description = "Query results limit", required = true) @RequestParam("limit") int limit,
-                                               @Parameter(description = "WebHook total size") @Schema(defaultValue = "false") @RequestParam("returnSize") boolean returnSize) {
+                                               @Parameter(description = "Include languages") @Schema(defaultValue = "false") @RequestParam("includeLanguages") boolean includeLanguages) {
 
         String currentUser = getCurrentUser();
         List<WebHookRestEntity> webHookRestEntities;
         try {
             WebHookList webHookList = new WebHookList();
-            webHookRestEntities = getWebHookRestEntities(currentUser);
-            if (returnSize) {
-                int webHookSize = webhookService.countWebhooks(currentUser, false);
-                webHookList.setSize(webHookSize);
-            }
+            webHookRestEntities = getWebHookRestEntities(currentUser, includeLanguages);
             webHookList.setWebhooks(webHookRestEntities);
             webHookList.setOffset(offset);
             webHookList.setLimit(limit);
@@ -110,6 +107,33 @@ public class HooksManagementController {
         }
     }
 
+    @GetMapping("{projectId}/directories")
+    @Secured("rewarding")
+    @Operation(summary = "Retrieves a list of project directories from crowdin", method = "GET")
+    @ApiResponse(responseCode = "200", description = "Request fulfilled")
+    @ApiResponse(responseCode = "404", description = "Not found")
+    @ApiResponse(responseCode = "400", description = "Bad request")
+    @ApiResponse(responseCode = "401", description = "Unauthorized")
+    @ApiResponse(responseCode = "503", description = "Service unavailable")
+    public List<RemoteDirectory> getProjectDirectories(
+            @Parameter(description = "Remote project identifier", required = true) @PathVariable("projectId") long projectId,
+            @RequestParam("offset") int offset,
+            @Parameter(description = "Query results limit") @RequestParam("limit") int limit
+    ) {
+        String currentUser = getCurrentUser();
+
+        try {
+            return webhookService.getProjectDirectories(projectId, currentUser, offset, limit);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (IllegalAccessException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        } catch (ObjectNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+
+
     @GetMapping("get-projects")
     @Secured("rewarding")
     @Operation(summary = "Retrieves a list of projects from crowdin", method = "GET")
@@ -136,6 +160,7 @@ public class HooksManagementController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
+
 
     @PostMapping
     @Secured("rewarding")
@@ -219,9 +244,9 @@ public class HooksManagementController {
     }
 
 
-    private List<WebHookRestEntity> getWebHookRestEntities(String username) throws IllegalAccessException {
+    private List<WebHookRestEntity> getWebHookRestEntities(String username, boolean includeLanguages) throws IllegalAccessException {
         Collection<WebHook> webHooks = webhookService.getWebhooks(username, 0, 20, false);
-        return webHookBuilder.toRestEntities(webHooks);
+        return webHookBuilder.toRestEntities(webHooks, includeLanguages);
     }
 
 }
