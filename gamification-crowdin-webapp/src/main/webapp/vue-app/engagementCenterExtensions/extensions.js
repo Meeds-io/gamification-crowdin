@@ -14,7 +14,7 @@ export function init() {
         realization.link = realization.objectId;
         return realization.link;
       },
-      isExtensible: false
+      isExtensible: true
     },
   });
 }

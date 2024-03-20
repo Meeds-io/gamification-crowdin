@@ -14,15 +14,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static io.meeds.gamification.crowdin.utils.Utils.extractSubItem;
+import static io.meeds.gamification.crowdin.utils.Utils.*;
 
 @Component
 public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
     private static final Log LOG                = ExoLogger.getLogger(SuggestionAddedTriggerPlugin.class);
     protected String EVENT_PAYLOAD_OBJECT_NAME = "translation";
-    protected String SUGGESTION_APPROVED_EVENT_TITLE =  "suggestionApproved";
-    protected String APPROVE_SUGGESTION_EVENT_TITLE =  "approveSuggestion";
-    protected String EVENT_TRIGGER =  "suggestion.approved";
+    protected String CROWDIN_EVENT_TRIGGER =  "suggestion.approved";
     protected String CANCELLING_EVENT_TRIGGER =  "suggestion.disapproved";
 
     @Autowired
@@ -36,18 +34,17 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
     @SuppressWarnings("unchecked")
     @Override
     public List<Event> getEvents(String trigger, Map<String, Object> payload, Object object) {
-        if (extractSubItem(payload, getPayloadObjectName(), "provider") != null) {
-            LOG.warn("Crowdin event {} translation provider is TM or MT", EVENT_TRIGGER);
-            return Collections.emptyList();
-        }
 
         List<Event> eventList = new ArrayList<>();
-        eventList.add(new Event(APPROVE_SUGGESTION_EVENT_TITLE,
-                extractSubItem(payload, getPayloadObjectName(), "user", "username"),
-                extractSubItem(payload, getPayloadObjectName(), "user", "username"),
-                extractSubItem(payload, getPayloadObjectName(), "string", "url"),
+        eventList.add(new Event(APPROVE_SUGGESTION_EVENT_NAME,
+                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "user", "username"),
+                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "user", "username"),
+                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "string", "url"),
                 EVENT_PAYLOAD_OBJECT_NAME,
-                extractSubItem(payload, getPayloadObjectName(), "string", "project", "id"),
+                getProjectId(payload),
+                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "targetLanguage", "id"),
+                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "provider") == null,
+                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "string", "file", "directoryId"),
                 trigger.equals(CANCELLING_EVENT_TRIGGER)));
 
         if (object == null) {
@@ -69,12 +66,15 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
             }
 
             if (translationById != null) {
-                eventList.add(new Event(SUGGESTION_APPROVED_EVENT_TITLE,
+                eventList.add(new Event(SUGGESTION_APPROVED_EVENT_NAME,
                         translationById.getUsername(),
                         translationById.getUsername(),
-                        extractSubItem(payload, getPayloadObjectName(), "string", "url"),
+                        extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "string", "url"),
                         EVENT_PAYLOAD_OBJECT_NAME,
-                        extractSubItem(payload, getPayloadObjectName(), "string", "project", "id"),
+                        getProjectId(payload),
+                        extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "targetLanguage", "id"),
+                        extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "provider") == null,
+                        extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "string", "file", "directoryId"),
                         trigger.equals(CANCELLING_EVENT_TRIGGER)));
             }
         }
@@ -84,7 +84,7 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
 
     @Override
     public String getEventName() {
-        return EVENT_TRIGGER;
+        return CROWDIN_EVENT_TRIGGER;
     }
 
     @Override
@@ -95,6 +95,11 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
     @Override
     public String getPayloadObjectName() {
         return EVENT_PAYLOAD_OBJECT_NAME;
+    }
+
+    @Override
+    public String getProjectId(Map<String, Object> payload) {
+        return extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "string", "project", "id");
     }
 
     @Override

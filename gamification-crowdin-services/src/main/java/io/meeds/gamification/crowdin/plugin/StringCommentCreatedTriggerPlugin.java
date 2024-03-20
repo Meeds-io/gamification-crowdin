@@ -10,13 +10,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static io.meeds.gamification.crowdin.utils.Utils.extractSubItem;
+import static io.meeds.gamification.crowdin.utils.Utils.*;
 
 @Component
 public class StringCommentCreatedTriggerPlugin extends CrowdinTriggerPlugin {
 
     protected String EVENT_PAYLOAD_OBJECT_NAME = "comment";
-    protected String EVENT_TITLE =  "stringCommentCreated";
     protected String EVENT_TRIGGER =  "stringComment.created";
     protected String CANCELLING_EVENT_TRIGGER =  "stringComment.deleted";
 
@@ -30,12 +29,15 @@ public class StringCommentCreatedTriggerPlugin extends CrowdinTriggerPlugin {
 
     @Override
     public List<Event> getEvents(String trigger, Map<String, Object> payload, Object object) {
-        return Collections.singletonList(new Event(EVENT_TITLE,
-                extractSubItem(payload, getPayloadObjectName(), "user", "username"),
-                extractSubItem(payload, getPayloadObjectName(), "user", "username"),
-                extractSubItem(payload, getPayloadObjectName(), "string", "url"),
+        return Collections.singletonList(new Event(STRING_COMMENT_CREATED_EVENT_NAME,
+                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "user", "username"),
+                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "user", "username"),
+                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "string", "url"),
                 EVENT_PAYLOAD_OBJECT_NAME,
-                extractSubItem(payload, getPayloadObjectName(), "string", "project", "id"),
+                getProjectId(payload),
+                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "targetLanguage", "id"),
+                true,
+                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "string", "file", "directoryId"),
                 trigger.equals(CANCELLING_EVENT_TRIGGER)));
     }
 
@@ -52,6 +54,11 @@ public class StringCommentCreatedTriggerPlugin extends CrowdinTriggerPlugin {
     @Override
     public String getPayloadObjectName() {
         return EVENT_PAYLOAD_OBJECT_NAME;
+    }
+
+    @Override
+    public String getProjectId(Map<String, Object> payload) {
+        return extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "string", "project", "id");
     }
 
     @Override
