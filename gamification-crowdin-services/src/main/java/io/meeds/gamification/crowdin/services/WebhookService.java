@@ -163,7 +163,7 @@ public class WebhookService {
     ) throws IllegalAccessException, ObjectNotFoundException {
 
         if (!Utils.isRewardingManager(currentUser)) {
-            throw new IllegalAccessException("The user is not authorized to access project repositories");
+            throw new IllegalAccessException("The user is not authorized to access project directories");
         }
 
         WebHook existsWebHook = webHookStorage.getWebhookByProjectId(remoteProjectId);

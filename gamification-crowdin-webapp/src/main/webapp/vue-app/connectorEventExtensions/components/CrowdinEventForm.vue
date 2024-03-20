@@ -46,9 +46,6 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         solo
         outlined
         @change="projectSelected">
-      <template #append-item>
-        <div v-intersect="onIntersect"></div>
-      </template>
       <template #selection="{item, selected}">
         <v-chip
             :input-value="selected"
@@ -117,9 +114,6 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
           chips
           deletable-chips
           @change="readySelection">
-        <template #append-item>
-          <div v-intersect="onIntersect"></div>
-        </template>
       </v-autocomplete>
     </template>
 
@@ -160,9 +154,6 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
           chips
           deletable-chips
           @change="readySelection">
-        <template #append-item>
-          <div v-intersect="onIntersect"></div>
-        </template>
       </v-autocomplete>
     </template>
 
@@ -256,6 +247,7 @@ export default {
   },
   watch: {
     value() {
+      console.log('value: watch');
       this.selected = this.projects[this.value];
       if (this.selected) {
         this.retrieveDirectories();
@@ -275,7 +267,7 @@ export default {
             this.anyDir = !this.properties?.directoryIds;
             this.anyLanguage = !this.properties?.languageIds;
             this.allowOnlyHuman = this.properties?.mustBeHuman === 'true';
-          } else if (this.projects.length === 1) {
+          } else if (this.projects.length > 0) {
             this.selected = this.projects[0];
             this.value = this.projects.indexOf(this.selected);
             this.anyDir = true;
@@ -316,16 +308,6 @@ export default {
             });
           }
         });
-    },
-    loadMore() {
-      this.offset += 24;
-      this.retrieveDirectories();
-    },
-    onIntersect () {
-      if (this.hasMore) {
-        this.offset += 24;
-        this.retrieveDirectories();
-      }
     },
     readySelection() {
       const eventProperties = {
