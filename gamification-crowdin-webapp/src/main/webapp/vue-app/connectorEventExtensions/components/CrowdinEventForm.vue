@@ -56,7 +56,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
               width="28">
           <v-tooltip bottom>
             <template #activator="{ on }">
-                <span v-on="on" class="text-truncate">{{ item.name }}
+                <span v-on="on" class="text-truncate">&nbsp;&nbsp;{{ item.name }}
                 </span>
             </template>
             <span>{{ item.name }}</span>
@@ -70,7 +70,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             width="28">
         <v-list-item-content>
           <v-list-item-title>
-            {{ item.name }}
+            &nbsp;&nbsp;{{ item.name }}
           </v-list-item-title>
         </v-list-item-content>
       </template>
@@ -335,15 +335,19 @@ export default {
       this.selectedLanguages = [];
       if (this.anyLanguage) {
         this.readySelection();
+      } else {
+        document.dispatchEvent(new CustomEvent('event-form-unfilled'));
       }
     },
-    projectSelected() {
+    projectSelected(projectId) {
       this.directories = [];
       this.selectedDirectories = [];
       this.selectedLanguages = [];
       this.allowOnlyHuman = true;
       this.offset = 0;
       this.anyDir = true;
+      this.anyLanguage = true;
+      this.selected = this.projects.find(obj => obj.id === projectId);
       this.readySelection();
     },
     changeRewardPerWords(rewardPerWords) {
