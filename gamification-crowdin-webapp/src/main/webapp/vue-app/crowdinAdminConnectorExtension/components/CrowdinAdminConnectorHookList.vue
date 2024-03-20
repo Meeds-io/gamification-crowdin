@@ -102,7 +102,7 @@ export default {
   methods: {
     refreshHooks() {
       this.loading = true;
-      return this.$crowdinConnectorService.getCrowdinWebHooks(this.offset, this.limit)
+      return this.$crowdinConnectorService.getCrowdinWebHooks(this.offset, this.limit, false)
         .then(data => {
           this.hooks = data;
           this.hooksCount = data.size || 0;

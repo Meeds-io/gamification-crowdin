@@ -45,13 +45,13 @@ public class WebHookBuilder {
     // Class with static methods
   }
 
-  public WebHookRestEntity toRestEntity(WebHook webHook) {
+  public WebHookRestEntity toRestEntity(WebHook webHook, boolean includeLanguages) {
     if (webHook == null) {
       return null;
     }
     RemoteProject remoteProject = null;
     try {
-      remoteProject = crowdinConsumerStorage.retrieveRemoteProject(webHook.getProjectId(), webHook.getToken());
+      remoteProject = crowdinConsumerStorage.retrieveRemoteProject(webHook.getProjectId(), includeLanguages, webHook.getToken());
     } catch (IllegalAccessException e) {
       LOG.error(e);
     }
@@ -69,11 +69,12 @@ public class WebHookBuilder {
                                  remoteProject != null ? remoteProject.getIdentifier() : null,
                                  remoteProject != null ? remoteProject.getDescription() : null,
                                  remoteProject != null ? remoteProject.getAvatarUrl() : null,
+                                 remoteProject != null ? remoteProject.getLanguages() : null,
                                  webhookService.isWebHookWatchLimitEnabled(webHook.getProjectId()),
                       remoteProject != null);
   }
 
-  public List<WebHookRestEntity> toRestEntities(Collection<WebHook> webHooks) {
-    return webHooks.stream().map(this::toRestEntity).toList();
+  public List<WebHookRestEntity> toRestEntities(Collection<WebHook> webHooks, boolean includeLanguages) {
+    return webHooks.stream().map(webHook -> toRestEntity(webHook, includeLanguages)).toList();
   }
 }

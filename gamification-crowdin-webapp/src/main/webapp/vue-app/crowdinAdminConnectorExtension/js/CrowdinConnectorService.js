@@ -32,8 +32,8 @@ export function getProjects(accessToken, hookId) {
   });
 }
 
-export function getCrowdinWebHooks(offset, limit) {
-  return fetch(`/gamification-crowdin/rest/crowdin/hooks?offset=${offset || 0}&limit=${limit|| 10}&returnSize=true`, {
+export function getCrowdinWebHooks(offset, limit, includeLanguages) {
+  return fetch(`/gamification-crowdin/rest/crowdin/hooks?offset=${offset || 0}&limit=${limit|| 10}&includeLanguages=${includeLanguages|| false}`, {
     method: 'GET',
     credentials: 'include',
   }).then((resp) => {
@@ -54,6 +54,19 @@ export function getCrowdinWebHookById(hookId) {
       return resp.json();
     } else {
       throw new Error('Error when getting crowdin webhook');
+    }
+  });
+}
+
+export function getWebHookDirectories(projectId, offset, limit) {
+  return fetch(`/gamification-crowdin/rest/crowdin/hooks/${projectId}/directories?offset=${offset || 0}&limit=${limit|| 25}`, {
+    method: 'GET',
+    credentials: 'include',
+  }).then((resp) => {
+    if (resp?.ok) {
+      return resp.json();
+    } else {
+      throw new Error('Error when getting github webhooks');
     }
   });
 }
