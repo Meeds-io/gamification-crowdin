@@ -8,7 +8,6 @@ import io.meeds.gamification.crowdin.plugin.CrowdinTriggerPlugin;
 import io.meeds.gamification.crowdin.storage.CrowdinConsumerStorage;
 import io.meeds.gamification.crowdin.storage.WebHookStorage;
 import io.meeds.gamification.service.ConnectorService;
-import io.meeds.gamification.service.EventService;
 import io.meeds.gamification.service.TriggerService;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.services.listener.ListenerService;
@@ -38,9 +37,6 @@ public class CrowdinTriggerService {
 
     @Autowired
     private IdentityManager identityManager;
-
-    @Autowired
-    private EventService eventService;
 
     @Autowired
     private ListenerService listenerService;
@@ -77,7 +73,7 @@ public class CrowdinTriggerService {
                 LOG.error("Trigger plugin for trigger : " + trigger + " wasn't found");
             } else {
 
-                String projectId = extractSubItem(eventMap, triggerPlugin.getPayloadObjectName(), "string", "project", "id");
+                String projectId = triggerPlugin.getProjectId(eventMap);
 
                 if (projectId == null) {
                     LOG.error("Project id is not found in the payload");
@@ -132,7 +128,9 @@ public class CrowdinTriggerService {
 
     private void broadcastCrowdinEvent(Event event, String senderId, String receiverId) {
         try {
-            String eventDetails = "{" + "projectId" + ": " + event.getProjectId() + "}";
+            String eventDetails = "{" + PROJECT_ID + ": " + event.getProjectId() + ", " + LANGUAGE_ID + ": "
+                    + event.getLanguageId() + ", " + MUST_BE_HUMAN + ": " + event.isMustBeHuman() + ", " + DIRECTORY_ID + ": "
+                    + event.getDirectoryId()  + "}";
             Map<String, String> gam = new HashMap<>();
             gam.put("senderId", senderId);
             gam.put("receiverId", receiverId);
@@ -140,7 +138,6 @@ public class CrowdinTriggerService {
             gam.put("objectType", event.getObjectType());
             gam.put("eventDetails", eventDetails);
             gam.put("ruleTitle", event.getName());
-            LOG.info("processEvent: gam: " + gam);
             if ( ! event.isCancelling()) {
                 listenerService.broadcast(GAMIFICATION_GENERIC_EVENT, gam, "");
                 LOG.info("Crowdin action {} broadcast for user {}", event.getName(), senderId);
@@ -179,7 +176,7 @@ public class CrowdinTriggerService {
 
             List<String> projectIds = eventsListMap.stream()
                     .filter(map -> map.containsKey("event") && map.get("event").equals(crowdinTriggerPlugin.getEventName()))
-                    .map(map -> extractSubItem(map, crowdinTriggerPlugin.getPayloadObjectName(), "string", "project", "id"))
+                    .map(crowdinTriggerPlugin::getProjectId)
                     .filter(Objects::nonNull)
                     .distinct()
                     .toList();
@@ -190,8 +187,7 @@ public class CrowdinTriggerService {
 
                 List<String> translationIds = eventsListMap.stream()
                         .filter(map -> map.containsKey("event") && map.get("event").equals(crowdinTriggerPlugin.getEventName()))
-                        .filter(map -> Objects.equals(extractSubItem(map,
-                                crowdinTriggerPlugin.getPayloadObjectName(), "string", "project", "id"), projectId))
+                        .filter(map -> Objects.equals(crowdinTriggerPlugin.getProjectId(map), projectId))
                         .map(map -> extractSubItem(map, crowdinTriggerPlugin.getPayloadObjectName(), "id"))
                         .filter(Objects::nonNull)
                         .distinct()

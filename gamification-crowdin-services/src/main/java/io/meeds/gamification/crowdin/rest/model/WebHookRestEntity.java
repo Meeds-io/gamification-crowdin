@@ -16,6 +16,7 @@
  */
 package io.meeds.gamification.crowdin.rest.model;
 
+import io.meeds.gamification.crowdin.model.RemoteLanguage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -53,6 +54,8 @@ public class WebHookRestEntity {
 
   private String       avatarUrl;
 
+  private List<RemoteLanguage>       languages;
+
   private boolean watchScopeLimited;
   private boolean isTokenValid;
 
@@ -69,6 +72,7 @@ public class WebHookRestEntity {
                            String title,
                            String description,
                            String avatarUrl,
+                           List<RemoteLanguage> languages,
                            boolean watchScopeLimited,
                            boolean isTokenValid) {
 
@@ -85,7 +89,9 @@ public class WebHookRestEntity {
     this.title = title;
     this.description = description;
     this.avatarUrl = avatarUrl;
+    this.languages = languages;
     this.watchScopeLimited = watchScopeLimited;
     this.isTokenValid = isTokenValid;
   }
+
 }

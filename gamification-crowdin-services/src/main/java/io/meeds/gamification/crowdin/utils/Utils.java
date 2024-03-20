@@ -27,6 +27,15 @@ public class Utils {
     public static final String    GAMIFICATION_GENERIC_EVENT          = "exo.gamification.generic.action";
 
     public static final String    GAMIFICATION_CANCEL_EVENT           = "gamification.cancel.event.action";
+    public static final String    STRING_COMMENT_CREATED_EVENT_NAME   = "stringCommentCreated";
+    public static final String    SUGGESTION_ADDED_EVENT_NAME         = "suggestionAdded";
+    public static final String    SUGGESTION_APPROVED_EVENT_NAME      = "suggestionApproved";
+    public static final String    APPROVE_SUGGESTION_EVENT_NAME       = "approveSuggestion";
+    public static final String   DIRECTORY_IDS                        = "directoryIds";
+    public static final String   DIRECTORY_ID                         = "directoryId";
+    public static final String   LANGUAGE_IDS                        = "languageIds";
+    public static final String   LANGUAGE_ID                         = "languageId";
+    public static final String   MUST_BE_HUMAN                       = "mustBeHuman";
 
     public static String encode(String token) {
         try {

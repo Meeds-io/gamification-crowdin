@@ -17,6 +17,7 @@
  */
 package io.meeds.gamification.crowdin.services;
 
+import io.meeds.gamification.crowdin.model.RemoteDirectory;
 import io.meeds.gamification.crowdin.model.RemoteProject;
 import io.meeds.gamification.crowdin.model.WebHook;
 import io.meeds.gamification.crowdin.storage.CrowdinConsumerStorage;
@@ -113,18 +114,6 @@ public class WebhookService {
         return getWebhooks(offset, limit, forceUpdate);
     }
 
-
-    public int countWebhooks(String currentUser, boolean forceUpdate) throws IllegalAccessException {
-        if (!Utils.isRewardingManager(currentUser)) {
-            throw new IllegalAccessException(AUTHORIZED_TO_ACCESS_CROWDIN_HOOKS);
-        }
-        if (forceUpdate) {
-            forceUpdateWebhooks();
-        }
-        return webHookStorage.countWebhooks();
-    }
-
-
     public boolean isWebHookWatchLimitEnabled(long projectRemoteId) {
         return false;
     }
@@ -167,6 +156,22 @@ public class WebhookService {
             forceUpdateWebhooks();
         }
         return getWebhooks(offset, limit);
+    }
+
+    public List<RemoteDirectory> getProjectDirectories(
+            long remoteProjectId, String currentUser, int offset, int limit
+    ) throws IllegalAccessException, ObjectNotFoundException {
+
+        if (!Utils.isRewardingManager(currentUser)) {
+            throw new IllegalAccessException("The user is not authorized to access project repositories");
+        }
+
+        WebHook existsWebHook = webHookStorage.getWebhookByProjectId(remoteProjectId);
+        if (existsWebHook == null) {
+            throw new ObjectNotFoundException("Webhook with project id '" + remoteProjectId + "' doesn't exist");
+        }
+
+        return crowdinConsumerStorage.getProjectDirectories(remoteProjectId, offset, limit, existsWebHook.getToken());
     }
 
 
