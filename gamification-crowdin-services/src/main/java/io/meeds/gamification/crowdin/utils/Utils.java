@@ -19,7 +19,6 @@ public class Utils {
     public static final String  AUTHORIZATION                         = "Authorization";
     public static final String  TOKEN                                 = "Bearer ";
     public static final String  CROWDIN_API_URL                       = "https://api.crowdin.com/api/v2";
-    public static final String  CROWDIN_GRAPHQL_API_URL               = "https://api.crowdin.com/api/graphql";
     public static final String  PROJECTS                              = "/projects/";
     public static final String  WEBHOOKS                              = "/webhooks/";
     public static final String  AUTHORIZED_TO_ACCESS_CROWDIN_HOOKS    = "The user is not authorized to access crowdin Hooks";
@@ -33,9 +32,19 @@ public class Utils {
     public static final String    APPROVE_SUGGESTION_EVENT_NAME       = "approveSuggestion";
     public static final String   DIRECTORY_IDS                        = "directoryIds";
     public static final String   DIRECTORY_ID                         = "directoryId";
-    public static final String   LANGUAGE_IDS                        = "languageIds";
-    public static final String   LANGUAGE_ID                         = "languageId";
-    public static final String   MUST_BE_HUMAN                       = "mustBeHuman";
+    public static final String   LANGUAGE_IDS                         = "languageIds";
+    public static final String   LANGUAGE_ID                          = "languageId";
+    public static final String   MUST_BE_HUMAN                        = "mustBeHuman";
+    public static final String   STRING                               = "string";
+    public static final String   TARGET_LANGUAGE                      = "targetLanguage";
+    public static final String   PROJECT                              = "project";
+    public static final String   ID                                   = "id";
+    public static final String   FILE                                 = "file";
+    public static final String   USER                                 = "user";
+    public static final String   USERNAME                             = "username";
+    public static final String   SOURCE_LANGUAGE_ID                   = "sourceLanguageId";
+    public static final String   IDENTIFIER                           = "identifier";
+    public static final String   PROVIDER                             = "provider";
 
     public static String encode(String token) {
         try {
@@ -105,5 +114,15 @@ public class Utils {
             return false;
         }
         return expected.equals(bearerToken);
+    }
+
+    public static String constructObjectIdAsJsonString(Map<String, Object> payload, String payloadObjectName) {
+        String id = extractSubItem(payload, payloadObjectName, ID);
+        String projectSlug = extractSubItem(payload, payloadObjectName, STRING, PROJECT, IDENTIFIER);
+        String fileId = extractSubItem(payload, payloadObjectName, STRING, FILE, ID);
+        String sourceLanguageId = extractSubItem(payload, payloadObjectName, STRING, PROJECT, SOURCE_LANGUAGE_ID);
+        String targetLanguageId = extractSubItem(payload, payloadObjectName, TARGET_LANGUAGE, ID);
+        return "{\"id\":"+ id +",\"stringUrl\":\"https://crowdin.com/editor/"
+                + projectSlug + "/"+ fileId +"/"+ sourceLanguageId +"-"+ targetLanguageId + "\"}";
     }
 }

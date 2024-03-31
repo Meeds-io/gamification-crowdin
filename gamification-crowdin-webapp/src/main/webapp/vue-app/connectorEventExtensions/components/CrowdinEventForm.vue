@@ -276,18 +276,19 @@ export default {
           }
 
           this.languages = this.selected?.languages;
-          this.loadingProjects = false;
 
           if (this.properties?.languageIds) {
             const selectedLanguagesArray = this.properties?.languageIds?.split(',');
             this.languages.forEach(rep => {
-              if (selectedLanguagesArray.map(str => Number(str)).includes(Number(rep.id))) {
+              if (selectedLanguagesArray.includes(rep.id)) {
                 if (!this.selectedLanguages.some(c => (c?.id === rep.id) || (c === rep.id))) {
                   this.selectedLanguages.push(rep.id);
                 }
               }
             });
           }
+
+          this.loadingProjects = false;
         });
     },
     retrieveDirectories() {
