@@ -44,9 +44,6 @@ public class CrowdinEventPlugin extends EventPlugin {
 
     @Override
     public boolean isValidEvent(Map<String, String> eventProperties, String triggerDetails) {
-        LOG.info("isValidEvent: started");
-        LOG.info("eventProperties: " + eventProperties);
-        LOG.info("triggerDetails: " + triggerDetails);
 
         String desiredProjectId = eventProperties.get(PROJECT_ID);
 
@@ -62,12 +59,7 @@ public class CrowdinEventPlugin extends EventPlugin {
                         .split(","))
                         : Collections.emptyList();
 
-        LOG.info("desiredDirectoryIds: " + desiredDirectoryIds);
-        LOG.info("desiredLanguageIds: " + desiredLanguageIds);
-
-
         Map<String, String> triggerDetailsMop = stringToMap(triggerDetails);
-        LOG.info("triggerDetailsMop: " + triggerDetailsMop);
 
         return desiredProjectId.equals(triggerDetailsMop.get(PROJECT_ID))
                 && desiredMustBeHuman.equals(triggerDetailsMop.get(MUST_BE_HUMAN))
