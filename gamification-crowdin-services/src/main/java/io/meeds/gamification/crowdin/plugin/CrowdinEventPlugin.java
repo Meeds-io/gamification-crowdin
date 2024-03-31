@@ -4,8 +4,6 @@ import io.meeds.gamification.plugin.EventPlugin;
 import io.meeds.gamification.service.EventService;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.collections.CollectionUtils;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,8 +12,6 @@ import java.util.*;
 import static io.meeds.gamification.crowdin.utils.Utils.*;
 @Component
 public class CrowdinEventPlugin extends EventPlugin {
-
-    private static final Log LOG                = ExoLogger.getLogger(CrowdinEventPlugin.class);
 
     public static final String EVENT_TYPE = "crowdin";
 
@@ -62,7 +58,7 @@ public class CrowdinEventPlugin extends EventPlugin {
         Map<String, String> triggerDetailsMop = stringToMap(triggerDetails);
 
         return desiredProjectId.equals(triggerDetailsMop.get(PROJECT_ID))
-                && desiredMustBeHuman.equals(triggerDetailsMop.get(MUST_BE_HUMAN))
+                && (desiredMustBeHuman.equals("false") || desiredMustBeHuman.equals(triggerDetailsMop.get(MUST_BE_HUMAN)))
                 && (CollectionUtils.isEmpty(desiredDirectoryIds) || desiredDirectoryIds.contains(triggerDetailsMop.get(DIRECTORY_ID)))
                 && (CollectionUtils.isEmpty(desiredLanguageIds) || desiredLanguageIds.contains(triggerDetailsMop.get(LANGUAGE_ID)));
     }

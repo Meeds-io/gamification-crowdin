@@ -38,7 +38,6 @@ public class SuggestionAddedTriggerPlugin extends CrowdinTriggerPlugin {
     @Override
     public List<Event> getEvents(String trigger, Map<String, Object> payload) {
         String objectId = constructObjectIdAsJsonString(payload, EVENT_PAYLOAD_OBJECT_NAME);
-        LOG.info("objectId: " + objectId);
 
         if (trigger.equals(CROWDIN_EVENT_TRIGGER)) {
             return Collections.singletonList(new Event(SUGGESTION_ADDED_EVENT_NAME,
