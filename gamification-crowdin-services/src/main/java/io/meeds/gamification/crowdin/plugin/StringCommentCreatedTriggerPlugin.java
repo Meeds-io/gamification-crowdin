@@ -28,16 +28,16 @@ public class StringCommentCreatedTriggerPlugin extends CrowdinTriggerPlugin {
     }
 
     @Override
-    public List<Event> getEvents(String trigger, Map<String, Object> payload, Object object) {
+    public List<Event> getEvents(String trigger, Map<String, Object> payload) {
         return Collections.singletonList(new Event(STRING_COMMENT_CREATED_EVENT_NAME,
-                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "user", "username"),
-                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "user", "username"),
-                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "string", "url"),
+                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, USER, USERNAME),
+                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, USER, USERNAME),
+                constructObjectIdAsJsonString(payload, EVENT_PAYLOAD_OBJECT_NAME),
                 EVENT_PAYLOAD_OBJECT_NAME,
                 getProjectId(payload),
-                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "targetLanguage", "id"),
+                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, TARGET_LANGUAGE, ID),
                 true,
-                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "string", "file", "directoryId"),
+                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, STRING, FILE, DIRECTORY_ID),
                 trigger.equals(CANCELLING_EVENT_TRIGGER)));
     }
 
@@ -52,17 +52,7 @@ public class StringCommentCreatedTriggerPlugin extends CrowdinTriggerPlugin {
     }
 
     @Override
-    public String getPayloadObjectName() {
-        return EVENT_PAYLOAD_OBJECT_NAME;
-    }
-
-    @Override
     public String getProjectId(Map<String, Object> payload) {
-        return extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "string", "project", "id");
-    }
-
-    @Override
-    public boolean batchQueryRemoteTranslations() {
-        return false;
+        return extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, STRING, PROJECT, ID);
     }
 }

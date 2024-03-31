@@ -2,6 +2,8 @@ package io.meeds.gamification.crowdin.plugin;
 
 import io.meeds.gamification.crowdin.model.Event;
 import io.meeds.gamification.crowdin.services.CrowdinTriggerService;
+import io.meeds.gamification.model.RealizationDTO;
+import io.meeds.gamification.service.RealizationService;
 import jakarta.annotation.PostConstruct;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -24,24 +26,52 @@ public class SuggestionAddedTriggerPlugin extends CrowdinTriggerPlugin {
     @Autowired
     private CrowdinTriggerService crowdinTriggerService;
 
+    @Autowired
+    private RealizationService realizationService;
+
     @PostConstruct
     public void initData() {
         crowdinTriggerService.addPlugin(this);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public List<Event> getEvents(String trigger, Map<String, Object> payload, Object object) {
+    public List<Event> getEvents(String trigger, Map<String, Object> payload) {
+        String objectId = constructObjectIdAsJsonString(payload, EVENT_PAYLOAD_OBJECT_NAME);
 
-        return Collections.singletonList(new Event(SUGGESTION_ADDED_EVENT_NAME,
-                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "user", "username"),
-                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "user", "username"),
-                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "string", "url"),
-                EVENT_PAYLOAD_OBJECT_NAME,
-                getProjectId(payload),
-                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "targetLanguage", "id"),
-                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "provider") == null,
-                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "string", "file", "directoryId"),
-                trigger.equals(CANCELLING_EVENT_TRIGGER)));
+        if (trigger.equals(CROWDIN_EVENT_TRIGGER)) {
+            return Collections.singletonList(new Event(SUGGESTION_ADDED_EVENT_NAME,
+                    extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, USER, USERNAME),
+                    extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, USER, USERNAME),
+                    objectId,
+                    EVENT_PAYLOAD_OBJECT_NAME,
+                    getProjectId(payload),
+                    extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, TARGET_LANGUAGE, ID),
+                    extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, PROVIDER) == null,
+                    extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, STRING, FILE, DIRECTORY_ID),
+                    false));
+        } else if (trigger.equals(CANCELLING_EVENT_TRIGGER)) {
+            List<RealizationDTO> realizations = realizationService.
+                    findRealizationsByObjectIdAndObjectType(objectId, EVENT_PAYLOAD_OBJECT_NAME);
+
+            if ( ! realizations.isEmpty()) {
+                String earnerId = realizations.get(0).getEarnerId();
+
+                return Collections.singletonList(new Event(SUGGESTION_ADDED_EVENT_NAME,
+                        earnerId,
+                        earnerId,
+                        objectId,
+                        EVENT_PAYLOAD_OBJECT_NAME,
+                        getProjectId(payload),
+                        extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, TARGET_LANGUAGE, ID),
+                        extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, PROVIDER) == null,
+                        extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, STRING, FILE, DIRECTORY_ID),
+                        true));
+            }
+        } else {
+            LOG.error("Unknown crowdin hook event {}", trigger);
+        }
+        return Collections.emptyList();
     }
 
     @Override
@@ -55,17 +85,7 @@ public class SuggestionAddedTriggerPlugin extends CrowdinTriggerPlugin {
     }
 
     @Override
-    public String getPayloadObjectName() {
-        return EVENT_PAYLOAD_OBJECT_NAME;
-    }
-
-    @Override
     public String getProjectId(Map<String, Object> payload) {
-        return extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, "string", "project", "id");
-    }
-
-    @Override
-    public boolean batchQueryRemoteTranslations() {
-        return false;
+        return extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, STRING, PROJECT, ID);
     }
 }

@@ -11,8 +11,13 @@ export function init() {
         'approveSuggestion'
       ].includes(actionLabel),
       getLink: (realization) => {
-        realization.link = realization.objectId;
-        return realization.link;
+        try {
+          const objId = JSON.parse(realization.objectId);
+          realization.link = objId.stringUrl;
+          return realization.link;
+        } catch (e) {
+          return null;
+        }
       },
       isExtensible: true
     },
