@@ -118,11 +118,12 @@ public class Utils {
 
     public static String constructObjectIdAsJsonString(Map<String, Object> payload, String payloadObjectName) {
         String id = extractSubItem(payload, payloadObjectName, ID);
+        String stringId = extractSubItem(payload, payloadObjectName, STRING, ID);
         String projectSlug = extractSubItem(payload, payloadObjectName, STRING, PROJECT, IDENTIFIER);
         String fileId = extractSubItem(payload, payloadObjectName, STRING, FILE, ID);
         String sourceLanguageId = extractSubItem(payload, payloadObjectName, STRING, PROJECT, SOURCE_LANGUAGE_ID);
         String targetLanguageId = extractSubItem(payload, payloadObjectName, TARGET_LANGUAGE, ID);
         return "{\"id\":"+ id +",\"stringUrl\":\"https://crowdin.com/editor/"
-                + projectSlug + "/"+ fileId +"/"+ sourceLanguageId +"-"+ targetLanguageId + "\"}";
+                + projectSlug + "/"+ fileId +"/"+ sourceLanguageId +"-"+ targetLanguageId + "?view=comfortable#" + stringId + "\"}";
     }
 }
