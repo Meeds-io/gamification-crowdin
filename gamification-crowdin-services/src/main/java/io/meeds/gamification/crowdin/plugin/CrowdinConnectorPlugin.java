@@ -1,7 +1,7 @@
 /*
  * This file is part of the Meeds project (https://meeds.io/).
  *
- * Copyright (C) 2023 Meeds Lab contact@meedslab.com
+ * Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,14 +24,17 @@ import com.github.scribejava.core.oauth.OAuth20Service;
 import io.meeds.gamification.crowdin.oauth.CrowdinApi;
 import io.meeds.gamification.model.RemoteConnectorSettings;
 import io.meeds.gamification.plugin.ConnectorPlugin;
+import io.meeds.gamification.service.ConnectorService;
 import io.meeds.gamification.service.ConnectorSettingService;
 import io.meeds.oauth.exception.OAuthException;
 import io.meeds.oauth.exception.OAuthExceptionCode;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -39,25 +42,32 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
-@Service
+@Component
 public class CrowdinConnectorPlugin extends ConnectorPlugin {
 
-  private static final Log LOG                = ExoLogger.getLogger(CrowdinConnectorPlugin.class);
+  private static final Log        LOG                = ExoLogger.getLogger(CrowdinConnectorPlugin.class);
 
-  private static final String           CONNECTOR_NAME = "crowdin";
+  private static final String     CONNECTOR_NAME     = "crowdin";
 
-  private static final String           CONNECTOR_REST_API = "https://api.crowdin.com/api/v2/user";
+  private static final String     NAME               = "crowdin";
 
-  private static final String           CONNECTOR_SCOPE    = "notification";
+  private static final String     CONNECTOR_REST_API = "https://api.crowdin.com/api/v2/user";
 
-  private OAuth20Service                oAuthService;
+  private static final String     CONNECTOR_SCOPE    = "notification";
 
-  private long                          remoteConnectorId;
+  private OAuth20Service          oAuthService;
 
+  private long                    remoteConnectorId;
+
+  @Autowired
   private ConnectorSettingService connectorSettingService;
 
-  public CrowdinConnectorPlugin(ConnectorSettingService connectorSettingsService) {
-    this.connectorSettingService = connectorSettingsService;
+  @Autowired
+  private ConnectorService        connectorService;
+
+  @PostConstruct
+  public void initData() {
+    connectorService.addPlugin(this);
   }
 
   @Override
@@ -66,19 +76,21 @@ public class CrowdinConnectorPlugin extends ConnectorPlugin {
   }
 
   @Override
+  public String getName() {
+    return NAME;
+  }
+
+  @Override
   public String validateToken(String code) throws OAuthException {
-    LOG.warn("validateToken: code: " + code);
     RemoteConnectorSettings remoteConnectorSettings = connectorSettingService.getConnectorSettings(CONNECTOR_NAME);
     remoteConnectorSettings.setSecretKey(connectorSettingService.getConnectorSecretKey(CONNECTOR_NAME));
     if (StringUtils.isBlank(remoteConnectorSettings.getApiKey()) || StringUtils.isBlank(remoteConnectorSettings.getSecretKey())) {
       LOG.warn("Missing '{}' connector settings", CONNECTOR_NAME);
       return null;
     }
-
     if (StringUtils.isNotBlank(code)) {
       try {
         OAuth2AccessToken oAuth2AccessToken = getOAuthService(remoteConnectorSettings).getAccessToken(code);
-        //CrowdinAccessTokenContext accessTokenContext = new CrowdinAccessTokenContext(oAuth2AccessToken);
         String crowdinIdentifier = fetchUsernameFromAccessToken(oAuth2AccessToken.getAccessToken());
 
         if (StringUtils.isBlank(crowdinIdentifier)) {
@@ -96,7 +108,6 @@ public class CrowdinConnectorPlugin extends ConnectorPlugin {
   }
 
   private static String fetchUsernameFromAccessToken(String accessToken) throws IOException {
-    LOG.warn("fetchUsernameFromAccessToken: accessToken: " + accessToken);
     URL url = new URL(CONNECTOR_REST_API);
     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
     connection.setRequestMethod("GET");
@@ -121,9 +132,9 @@ public class CrowdinConnectorPlugin extends ConnectorPlugin {
     if (oAuthService == null || remoteConnectorSettings.hashCode() != remoteConnectorId) {
       remoteConnectorId = remoteConnectorSettings.hashCode();
       oAuthService = new ServiceBuilder(remoteConnectorSettings.getApiKey()).apiSecret(remoteConnectorSettings.getSecretKey())
-              .callback(remoteConnectorSettings.getRedirectUrl())
-              .defaultScope(CONNECTOR_SCOPE)
-              .build(CrowdinApi.instance());
+                                                                            .callback(remoteConnectorSettings.getRedirectUrl())
+                                                                            .defaultScope(CONNECTOR_SCOPE)
+                                                                            .build(CrowdinApi.instance());
     }
     return oAuthService;
   }

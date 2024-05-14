@@ -1,3 +1,21 @@
+/*
+ * This file is part of the Meeds project (https://meeds.io/).
+ *
+ * Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
 package io.meeds.gamification.crowdin.plugin;
 
 import io.meeds.gamification.crowdin.model.Event;
@@ -15,44 +33,40 @@ import static io.meeds.gamification.crowdin.utils.Utils.*;
 @Component
 public class StringCommentCreatedTriggerPlugin extends CrowdinTriggerPlugin {
 
-    protected String EVENT_PAYLOAD_OBJECT_NAME = "comment";
-    protected String EVENT_TRIGGER =  "stringComment.created";
-    protected String CANCELLING_EVENT_TRIGGER =  "stringComment.deleted";
+  @Autowired
+  private CrowdinTriggerService crowdinTriggerService;
 
-    @Autowired
-    private CrowdinTriggerService crowdinTriggerService;
+  @PostConstruct
+  public void init() {
+    crowdinTriggerService.addPlugin(this);
+  }
 
-    @PostConstruct
-    public void initData() {
-        crowdinTriggerService.addPlugin(this);
-    }
+  @Override
+  public List<Event> getEvents(String trigger, Map<String, Object> payload) {
+    return Collections.singletonList(new Event(STRING_COMMENT_CREATED_EVENT_NAME,
+                                               extractSubItem(payload, COMMENT, USER, USERNAME),
+                                               extractSubItem(payload, COMMENT, USER, USERNAME),
+                                               constructObjectIdAsJsonString(payload, COMMENT),
+                                               COMMENT,
+                                               getProjectId(payload),
+                                               extractSubItem(payload, COMMENT, TARGET_LANGUAGE, ID),
+                                               true,
+                                               extractSubItem(payload, COMMENT, STRING, FILE, DIRECTORY_ID),
+                                               trigger.equals(COMMENT_DELETED_TRIGGER)));
+  }
 
-    @Override
-    public List<Event> getEvents(String trigger, Map<String, Object> payload) {
-        return Collections.singletonList(new Event(STRING_COMMENT_CREATED_EVENT_NAME,
-                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, USER, USERNAME),
-                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, USER, USERNAME),
-                constructObjectIdAsJsonString(payload, EVENT_PAYLOAD_OBJECT_NAME),
-                EVENT_PAYLOAD_OBJECT_NAME,
-                getProjectId(payload),
-                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, TARGET_LANGUAGE, ID),
-                true,
-                extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, STRING, FILE, DIRECTORY_ID),
-                trigger.equals(CANCELLING_EVENT_TRIGGER)));
-    }
+  @Override
+  public String getEventName() {
+    return COMMENT_CREATED_TRIGGER;
+  }
 
-    @Override
-    public String getEventName() {
-        return EVENT_TRIGGER;
-    }
+  @Override
+  public String getCancellingEventName() {
+    return COMMENT_DELETED_TRIGGER;
+  }
 
-    @Override
-    public String getCancellingEventName() {
-        return CANCELLING_EVENT_TRIGGER;
-    }
-
-    @Override
-    public String getProjectId(Map<String, Object> payload) {
-        return extractSubItem(payload, EVENT_PAYLOAD_OBJECT_NAME, STRING, PROJECT, ID);
-    }
+  @Override
+  public String getProjectId(Map<String, Object> payload) {
+    return extractSubItem(payload, COMMENT, STRING, PROJECT, ID);
+  }
 }
