@@ -1,7 +1,7 @@
 /*
  * This file is part of the Meeds project (https://meeds.io/).
  *
- * Copyright (C) 2023 Meeds Lab contact@meedslab.com
+ * Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -11,6 +11,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
@@ -33,10 +34,10 @@ import java.util.List;
 @Component
 public class WebHookBuilder {
 
-  private static final Log LOG                = ExoLogger.getLogger(WebHookBuilder.class);
+  private static final Log       LOG = ExoLogger.getLogger(WebHookBuilder.class);
 
   @Autowired
-  private WebhookService webhookService;
+  private WebhookService         webhookService;
 
   @Autowired
   private CrowdinConsumerStorage crowdinConsumerStorage;
@@ -70,8 +71,8 @@ public class WebHookBuilder {
                                  remoteProject != null ? remoteProject.getDescription() : null,
                                  remoteProject != null ? remoteProject.getAvatarUrl() : null,
                                  remoteProject != null ? remoteProject.getLanguages() : null,
-                                 webhookService.isWebHookWatchLimitEnabled(webHook.getProjectId()),
-                      remoteProject != null);
+                                 false,
+                                 remoteProject != null);
   }
 
   public List<WebHookRestEntity> toRestEntities(Collection<WebHook> webHooks, boolean includeLanguages) {

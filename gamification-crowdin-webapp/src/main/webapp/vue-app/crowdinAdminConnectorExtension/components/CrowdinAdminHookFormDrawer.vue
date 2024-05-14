@@ -1,17 +1,20 @@
 <!--
-This file is part of the Meeds project (https://meeds.io/).
-Copyright (C) 2023 Meeds Lab contact@meedslab.com
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 3 of the License, or (at your option) any later version.
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software Foundation,
-Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ This file is part of the Meeds project (https://meeds.io/).
+
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <exo-drawer
@@ -84,7 +87,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                           class="text-header-title"
                           @click="editAccessToken"
                           v-text="isTokenEditing ? 'fas fa-check' : (isFetchingProjects) ? 'fas fa-spinner fa-spin' : 'fas fa fa-edit'"
-                          :style="{ 'transform-origin': 'unset !important'}"/>
+                          :style="{ 'transform-origin': 'unset !important'}" />
                       </v-slide-x-reverse-transition>
                     </template>
                   </v-text-field>
@@ -112,11 +115,11 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                     class="ignore-vuetify-classes flex-grow-1"
                     required
                     @change="hookEdited = true">
-                    <template v-if="data" v-slot:selection="data">
+                    <template v-if="data" #selection="data">
                       <!-- HTML that describe how select should render selected items -->
                       {{ data.item.name }} / {{ data.item.identifier }}
                     </template>
-                    <template v-if="data" v-slot:item="data">
+                    <template v-if="data" #item="data">
                       <!-- HTML that describe how select should render items when the select is open -->
                       {{ data.item.name }} / {{ data.item.identifier }}
                     </template>
@@ -151,14 +154,14 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
           {{ $t('crowdinConnector.webhook.form.label.button.next') }}
         </v-btn>
         <v-btn
-            v-if="stepper === 1 && isFetchingProjects"
-            :disabled="disableNextStepButton"
-            class="btn btn-primary"
-            @click="nextStep">
+          v-if="stepper === 1 && isFetchingProjects"
+          :disabled="disableNextStepButton"
+          class="btn btn-primary"
+          @click="nextStep">
           <i class="fas fa-spinner fa-spin"></i>
         </v-btn>
         <v-btn
-            v-if="stepper === 2"
+          v-if="stepper === 2"
           :disabled="disabledSave"
           :loading="loading"
           class="btn btn-primary"

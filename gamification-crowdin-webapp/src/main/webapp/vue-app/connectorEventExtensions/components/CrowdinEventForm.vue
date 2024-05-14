@@ -27,37 +27,34 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
       color="primary"
       size="20"
       class="ms-3 my-auto" />
-
-    <!--    Projects   -->
-
     <v-autocomplete
-        v-if="!loadingProjects"
-        id="projectAutoComplete"
-        ref="projectAutoComplete"
-        v-model="selected"
-        :items="projects"
-        :placeholder="$t('gamification.event.form.project.placeholder')"
-        class="pa-0"
-        background-color="white"
-        item-value="id"
-        item-text="name"
-        dense
-        flat
-        solo
-        outlined
-        @change="projectSelected">
+      v-if="!loadingProjects"
+      id="projectAutoComplete"
+      ref="projectAutoComplete"
+      v-model="selected"
+      :items="projects"
+      :placeholder="$t('gamification.event.form.project.placeholder')"
+      class="pa-0"
+      background-color="white"
+      item-value="id"
+      item-text="name"
+      dense
+      flat
+      solo
+      outlined
+      @change="projectSelected">
       <template #selection="{item, selected}">
         <v-chip
-            :input-value="selected"
-            color="white">
+          :input-value="selected"
+          color="white">
           <img
-              :src="getAvatarUrl(item)"
-              :alt="item.name"
-              width="28">
+            :src="getAvatarUrl(item)"
+            :alt="item.name"
+            width="28">
           <v-tooltip bottom>
             <template #activator="{ on }">
-                <span v-on="on" class="text-truncate">&nbsp;&nbsp;{{ item.name }}
-                </span>
+              <span v-on="on" class="text-truncate">&nbsp;&nbsp;{{ item.name }}
+              </span>
             </template>
             <span>{{ item.name }}</span>
           </v-tooltip>
@@ -65,9 +62,9 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
       </template>
       <template #item="{item}">
         <img
-            :src="getAvatarUrl(item)"
-            :alt="item.name"
-            width="28">
+          :src="getAvatarUrl(item)"
+          :alt="item.name"
+          width="28">
         <v-list-item-content>
           <v-list-item-title>
             &nbsp;&nbsp;{{ item.name }}
@@ -75,10 +72,6 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         </v-list-item-content>
       </template>
     </v-autocomplete>
-
-
-    <!--    Directory   -->
-
     <template v-if="selected">
       <div class="d-flex flex-row">
         <v-card-text class="px-0 dark-grey-color font-weight-bold">
@@ -87,38 +80,34 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         <div class="d-flex flex-row">
           <div class="ma-auto"> {{ $t('gamification.event.form.any') }}</div>
           <v-checkbox
-              v-model="anyDir"
-              class="mt-0 pt-0 align-center"
-              color="primary"
-              dense
-              hide-details
-              @click="changeDirectorySelection" />
+            v-model="anyDir"
+            class="mt-0 pt-0 align-center"
+            color="primary"
+            dense
+            hide-details
+            @click="changeDirectorySelection" />
         </div>
       </div>
       <v-autocomplete
-          v-if="!anyDir"
-          id="directoryAutoComplete"
-          ref="directoryAutoComplete"
-          v-model="selectedDirectories"
-          :items="directories"
-          :disabled="anyDir"
-          :placeholder="$t('gamification.event.form.directory.placeholder')"
-          class="pa-0"
-          background-color="white"
-          item-value="id"
-          item-text="path"
-          dense
-          flat
-          outlined
-          multiple
-          chips
-          deletable-chips
-          @change="readySelection">
-      </v-autocomplete>
+        v-if="!anyDir"
+        id="directoryAutoComplete"
+        ref="directoryAutoComplete"
+        v-model="selectedDirectories"
+        :items="directories"
+        :disabled="anyDir"
+        :placeholder="$t('gamification.event.form.directory.placeholder')"
+        class="pa-0"
+        background-color="white"
+        item-value="id"
+        item-text="path"
+        dense
+        flat
+        outlined
+        multiple
+        chips
+        deletable-chips
+        @change="readySelection" />
     </template>
-
-    <!--    Language   -->
-
     <template v-if="selected">
       <div class="d-flex flex-row">
         <v-card-text class="px-0 dark-grey-color font-weight-bold">
@@ -127,86 +116,77 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         <div class="d-flex flex-row">
           <div class="ma-auto"> {{ $t('gamification.event.form.any') }}</div>
           <v-checkbox
-              v-model="anyLanguage"
-              class="mt-0 pt-0 align-center"
-              color="primary"
-              dense
-              hide-details
-              @click="changeLanguageSelection" />
+            v-model="anyLanguage"
+            class="mt-0 pt-0 align-center"
+            color="primary"
+            dense
+            hide-details
+            @click="changeLanguageSelection" />
         </div>
       </div>
       <v-autocomplete
-          v-if="!anyLanguage"
-          id="directoryAutoComplete"
-          ref="directoryAutoComplete"
-          v-model="selectedLanguages"
-          :items="languages"
-          :disabled="anyLanguage"
-          :placeholder="$t('gamification.event.form.language.placeholder')"
-          class="pa-0"
-          background-color="white"
-          item-value="id"
-          item-text="name"
-          dense
-          flat
-          outlined
-          multiple
-          chips
-          deletable-chips
-          @change="readySelection">
-      </v-autocomplete>
+        v-if="!anyLanguage"
+        id="directoryAutoComplete"
+        ref="directoryAutoComplete"
+        v-model="selectedLanguages"
+        :items="languages"
+        :disabled="anyLanguage"
+        :placeholder="$t('gamification.event.form.language.placeholder')"
+        class="pa-0"
+        background-color="white"
+        item-value="id"
+        item-text="name"
+        dense
+        flat
+        outlined
+        multiple
+        chips
+        deletable-chips
+        @change="readySelection" />
     </template>
-
-    <!--    Human   -->
-
     <div class="d-flex flex-row" v-if="selected">
       <v-card-text class="px-0 dark-grey-color font-weight-bold">
         {{ $t('gamification.event.form.human') }}
       </v-card-text>
       <div class="d-flex flex-row">
         <v-switch
-            v-model="allowOnlyHuman"
-            color="primary"
-            class="ma-auto"
-            hide-details
-            @change="readySelection" />
+          v-model="allowOnlyHuman"
+          color="primary"
+          class="ma-auto"
+          hide-details
+          @change="readySelection" />
       </div>
     </div>
-
-    <!--    Words Counter   -->
-
     <div class="d-flex flex-row" v-if="selected">
       <v-card-text class="px-0 dark-grey-color font-weight-bold">
         {{ $t('gamification.event.form.words.title') }}
       </v-card-text>
       <div class="d-flex flex-row">
         <v-switch
-            v-model="rewardPerWords"
-            color="primary"
-            class="ma-auto"
-            hide-details
-            @change="changeRewardPerWords" />
+          v-model="rewardPerWords"
+          color="primary"
+          class="ma-auto"
+          hide-details
+          @change="changeRewardPerWords" />
       </div>
     </div>
-
     <v-card
-        v-if="rewardPerWords"
-        flat
-        width="180"
-        class="d-flex flex-grow-1">
+      v-if="rewardPerWords"
+      flat
+      width="180"
+      class="d-flex flex-grow-1">
       <v-text-field
-          v-model="counter"
-          class="mt-0 pt-0 me-2"
-          type="number"
-          outlined
-          dense
-          required>
+        v-model="counter"
+        class="mt-0 pt-0 me-2"
+        type="number"
+        outlined
+        dense
+        required>
         <template #append-outer>
           <label class="mt-1">{{ $t('gamification.event.form.words') }}</label>
         </template>
       </v-text-field>
     </v-card>
-
   </v-app>
 </template>
 

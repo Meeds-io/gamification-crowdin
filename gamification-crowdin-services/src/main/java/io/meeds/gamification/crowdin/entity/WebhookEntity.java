@@ -1,6 +1,8 @@
 /*
  * This file is part of the Meeds project (https://meeds.io/).
- * Copyright (C) 2023 Meeds Lab contact@meedslab.com
+ *
+ * Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -9,30 +11,23 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 package io.meeds.gamification.crowdin.entity;
 
-import jakarta.persistence.*;
-import lombok.Data;
-import org.exoplatform.commons.api.persistence.ExoEntity;
-import org.exoplatform.commons.utils.StringListConverter;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import jakarta.persistence.*;
+import lombok.Data;
+import org.exoplatform.commons.utils.StringListConverter;
+
 @Entity(name = "CrowdinWebhooks")
-@ExoEntity
 @Table(name = "CROWDIN_WEBHOOKS")
-@NamedQuery(name = "CrowdinWebhooks.getWebhookByProjectId",
-            query = "SELECT crowdinWebhook FROM CrowdinWebhooks crowdinWebhook"
-                    + " WHERE crowdinWebhook.projectId = :projectId")
-@NamedQuery(name = "CrowdinWebhooks.getWebhookIds",
-            query = "SELECT crowdinWebhook.id FROM CrowdinWebhooks crowdinWebhook"
-                    + " ORDER BY crowdinWebhook.id ASC")
 @Data
 public class WebhookEntity implements Serializable {
 
@@ -51,7 +46,7 @@ public class WebhookEntity implements Serializable {
   private Long              projectId;
 
   @Column(name = "PROJECT_NAME", nullable = false)
-  private String              projectName;
+  private String            projectName;
 
   @Convert(converter = StringListConverter.class)
   @Column(name = "TRIGGERS", nullable = false)

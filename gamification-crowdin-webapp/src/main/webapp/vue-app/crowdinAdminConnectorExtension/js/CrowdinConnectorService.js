@@ -1,7 +1,8 @@
 /*
  * This file is part of the Meeds project (https://meeds.io/).
- * Copyright (C) 2023 Meeds Lab
- * contact@meedslab.com
+ *
+ * Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -14,7 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-
 export function getProjects(accessToken, hookId) {
   return fetch(`/gamification-crowdin/rest/crowdin/hooks/get-projects?accessToken=${accessToken || ''}&hookId=${hookId || ''}`  , {
     method: 'GET',
