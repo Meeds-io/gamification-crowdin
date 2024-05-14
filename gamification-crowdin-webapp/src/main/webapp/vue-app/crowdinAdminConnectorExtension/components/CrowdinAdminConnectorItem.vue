@@ -1,17 +1,20 @@
 <!--
-This file is part of the Meeds project (https://meeds.io/).
-Copyright (C) 2023 Meeds Lab contact@meedslab.com
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 3 of the License, or (at your option) any later version.
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software Foundation,
-Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ This file is part of the Meeds project (https://meeds.io/).
+
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <v-app>
@@ -20,10 +23,10 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         <v-tooltip :disabled="$root.isMobile" bottom>
           <template #activator="{ on }">
             <v-btn
-                class="ps-0"
-                outlined
-                v-on="on"
-                @click="backToConnectorDetail">
+              class="ps-0"
+              outlined
+              v-on="on"
+              @click="backToConnectorDetail">
               <v-icon size="18" class="text-color mx-2">fa-arrow-left</v-icon>
               <span class="text-color font-weight-bold icon-default-size">{{ $t('crowdinConnector.admin.label.configuration') }}</span>
             </v-btn>
@@ -32,9 +35,9 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         </v-tooltip>
         <v-spacer />
         <v-btn
-            class="width-auto ms-n3"
-            icon
-            @click="forceUpdateWebhooks">
+          class="width-auto ms-n3"
+          icon
+          @click="forceUpdateWebhooks">
           <v-icon size="18" class="icon-default-color mx-2">fas fa-redo-alt</v-icon>
         </v-btn>
       </div>
@@ -51,23 +54,23 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
           <v-spacer />
           <div class="d-flex flex-row">
             <v-switch
-                v-model="enabled"
-                color="primary"
-                class="ma-auto"
-                hide-details
-                @change="saveConnectorSetting(enabled)" />
+              v-model="enabled"
+              color="primary"
+              class="ma-auto"
+              hide-details
+              @change="saveConnectorSetting(enabled)" />
             <div class="d-flex align-center px-2">
               <v-btn
-                  icon
-                  @click="openConnectionSetting">
+                icon
+                @click="openConnectionSetting">
                 <v-icon size="20">fas fa-edit</v-icon>
               </v-btn>
             </div>
             <div class="d-flex align-center">
               <v-btn
-                  class="ma-auto"
-                  icon
-                  @click="deleteConfirmDialog">
+                class="ma-auto"
+                icon
+                @click="deleteConfirmDialog">
                 <v-icon class="error-color" size="18">fas fa-trash-alt</v-icon>
               </v-btn>
             </div>
@@ -83,9 +86,9 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             {{ $t('crowdinConnector.admin.label.letEnableConnection') }}
           </span>
           <v-btn
-              class="btn btn-primary"
-              small
-              @click="saveConnectorSetting(true)">
+            class="btn btn-primary"
+            small
+            @click="saveConnectorSetting(true)">
             {{ $t('crowdinConnector.admin.label.enableConnection') }}
           </v-btn>
         </div>
@@ -101,9 +104,9 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             </span>
           </template>
           <v-btn
-              class="btn btn-primary ma-auto"
-              small
-              @click="openConnectionSetting">
+            class="btn btn-primary ma-auto"
+            small
+            @click="openConnectionSetting">
             <v-icon size="14" dark>
               fas fa-cogs
             </v-icon>
@@ -116,18 +119,18 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
       <crowdin-admin-connector-hook-list @updated="webhooksUpdated" />
     </template>
     <crowdin-admin-connector-hook-detail
-        v-else
-        :hook="selectedHook"
-        @close="displayHookDetail = false" />
+      v-else
+      :hook="selectedHook"
+      @close="displayHookDetail = false" />
     <crowdin-admin-hook-form-drawer />
     <crowdin-admin-connection-setting-drawer ref="connectionSettingDrawer" />
     <exo-confirm-dialog
-        ref="deleteConfirmDialog"
-        :message="$t('gamification.connectors.message.confirmDeleteConnectorSetting')"
-        :title="$t('gamification.connectors.title.confirmDeleteConnectorSetting')"
-        :ok-label="$t('confirm.yes')"
-        :cancel-label="$t('confirm.no')"
-        @ok="deleteSettings" />
+      ref="deleteConfirmDialog"
+      :message="$t('gamification.connectors.message.confirmDeleteConnectorSetting')"
+      :title="$t('gamification.connectors.title.confirmDeleteConnectorSetting')"
+      :ok-label="$t('confirm.yes')"
+      :cancel-label="$t('confirm.no')"
+      @ok="deleteSettings" />
   </v-app>
 </template>
 
