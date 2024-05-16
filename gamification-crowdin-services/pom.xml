@@ -31,6 +31,9 @@
   <artifactId>gamification-crowdin-service</artifactId>
   <packaging>jar</packaging>
   <name>Meeds:: Gamification Crowdin - Service</name>
+  <properties>
+    <exo.test.coverage.ratio>0.17</exo.test.coverage.ratio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.social</groupId>

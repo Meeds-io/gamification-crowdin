@@ -233,7 +233,7 @@ public class HooksManagementController {
     }
     String currentUser = ConversationState.getCurrent().getIdentity().getUserId();
     try {
-      webhookService.deleteWebhookHook(projectId, currentUser);
+      webhookService.deleteWebhook(projectId, currentUser);
     } catch (IllegalAccessException e) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
     } catch (ObjectNotFoundException e) {
