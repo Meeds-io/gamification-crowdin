@@ -21,11 +21,9 @@ package io.meeds.gamification.crowdin.rest.builder;
 import io.meeds.gamification.crowdin.model.RemoteProject;
 import io.meeds.gamification.crowdin.model.WebHook;
 import io.meeds.gamification.crowdin.rest.model.WebHookRestEntity;
-import io.meeds.gamification.crowdin.services.WebhookService;
 import io.meeds.gamification.crowdin.storage.CrowdinConsumerStorage;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -34,19 +32,15 @@ import java.util.List;
 @Component
 public class WebHookBuilder {
 
-  private static final Log       LOG = ExoLogger.getLogger(WebHookBuilder.class);
-
-  @Autowired
-  private WebhookService         webhookService;
-
-  @Autowired
-  private CrowdinConsumerStorage crowdinConsumerStorage;
+  private static final Log LOG = ExoLogger.getLogger(WebHookBuilder.class);
 
   private WebHookBuilder() {
     // Class with static methods
   }
 
-  public WebHookRestEntity toRestEntity(WebHook webHook, boolean includeLanguages) {
+  public static WebHookRestEntity toRestEntity(CrowdinConsumerStorage crowdinConsumerStorage,
+                                               WebHook webHook,
+                                               boolean includeLanguages) {
     if (webHook == null) {
       return null;
     }
@@ -75,7 +69,9 @@ public class WebHookBuilder {
                                  remoteProject != null);
   }
 
-  public List<WebHookRestEntity> toRestEntities(Collection<WebHook> webHooks, boolean includeLanguages) {
-    return webHooks.stream().map(webHook -> toRestEntity(webHook, includeLanguages)).toList();
+  public static List<WebHookRestEntity> toRestEntities(CrowdinConsumerStorage crowdinConsumerStorage,
+                                                       Collection<WebHook> webHooks,
+                                                       boolean includeLanguages) {
+    return webHooks.stream().map(webHook -> toRestEntity(crowdinConsumerStorage, webHook, includeLanguages)).toList();
   }
 }

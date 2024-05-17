@@ -107,7 +107,7 @@ export default {
       this.loading = true;
       return this.$crowdinConnectorService.getCrowdinWebHooks(this.offset, this.limit, false)
         .then(data => {
-          this.hooks = data;
+          this.hooks = data.webhooks;
           this.hooksCount = data.size || 0;
           return this.$nextTick()
             .then(() => {

@@ -25,11 +25,14 @@ import io.meeds.gamification.crowdin.rest.builder.WebHookBuilder;
 import io.meeds.gamification.crowdin.rest.model.WebHookList;
 import io.meeds.gamification.crowdin.rest.model.WebHookRestEntity;
 import io.meeds.gamification.crowdin.services.WebhookService;
+import io.meeds.gamification.crowdin.storage.CrowdinConsumerStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.ObjectAlreadyExistsException;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
@@ -48,29 +51,26 @@ import java.util.List;
 import static io.meeds.gamification.utils.Utils.getCurrentUser;
 
 @RestController
-@RequestMapping("/crowdin/hooks")
+@RequestMapping("crowdin/hooks")
 @Tag(name = "hooks", description = "An endpoint to manage crowdin webhooks")
-public class HooksManagementController {
+public class HooksManagementRest {
 
-  public static final String CROWDIN_HOOK_NOT_FOUND = "The Crowdin hook doesn't exit";
-
-  @Autowired
-  private WebhookService     webhookService;
+  public static final String     CROWDIN_HOOK_NOT_FOUND = "The Crowdin hook doesn't exit";
 
   @Autowired
-  private WebHookBuilder     webHookBuilder;
+  private WebhookService         webhookService;
+
+  @Autowired
+  private CrowdinConsumerStorage crowdinConsumerStorage;
 
   @GetMapping
   @Secured("rewarding")
   @Operation(summary = "Retrieves the list Crowdin webHooks", method = "GET")
-  @ApiResponse(responseCode = "200", description = "Request fulfilled")
-  @ApiResponse(responseCode = "404", description = "Not found")
-  @ApiResponse(responseCode = "400", description = "Bad request")
-  @ApiResponse(responseCode = "401", description = "Unauthorized")
-  @ApiResponse(responseCode = "503", description = "Service unavailable")
-  public List<WebHookRestEntity> getWebHooks(@RequestParam("offset") int offset,
-                                             @Parameter(description = "Query results limit", required = true) @RequestParam("limit") int limit,
-                                             @Parameter(description = "Include languages") @Schema(defaultValue = "false") @RequestParam("includeLanguages") boolean includeLanguages) {
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public WebHookList getWebHooks(@RequestParam("offset") int offset,
+                                 @Parameter(description = "Query results limit", required = true) @RequestParam("limit") int limit,
+                                 @Parameter(description = "Include languages") @Schema(defaultValue = "false") @RequestParam("includeLanguages") boolean includeLanguages) {
 
     String currentUser = getCurrentUser();
     List<WebHookRestEntity> webHookRestEntities;
@@ -80,10 +80,9 @@ public class HooksManagementController {
       webHookList.setWebhooks(webHookRestEntities);
       webHookList.setOffset(offset);
       webHookList.setLimit(limit);
-      return webHookRestEntities;
+      return webHookList;
     } catch (IllegalAccessException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
   }
 
@@ -119,13 +118,12 @@ public class HooksManagementController {
   @ApiResponse(responseCode = "400", description = "Bad request")
   @ApiResponse(responseCode = "401", description = "Unauthorized")
   @ApiResponse(responseCode = "503", description = "Service unavailable")
-  public List<RemoteDirectory> getProjectDirectories(@Parameter(description = "Remote project identifier", required = true) @PathVariable("projectId") long projectId,
+  public List<RemoteDirectory> getProjectDirectories(HttpServletRequest request,
+                                                     @Parameter(description = "Remote project identifier", required = true) @PathVariable("projectId") long projectId,
                                                      @RequestParam("offset") int offset,
                                                      @Parameter(description = "Query results limit") @RequestParam("limit") int limit) {
-    String currentUser = getCurrentUser();
-
     try {
-      return webhookService.getProjectDirectories(projectId, currentUser, offset, limit);
+      return webhookService.getProjectDirectories(projectId, request.getRemoteUser(), offset, limit);
     } catch (IllegalArgumentException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (IllegalAccessException e) {
@@ -135,7 +133,7 @@ public class HooksManagementController {
     }
   }
 
-  @GetMapping("get-projects")
+  @GetMapping("projects")
   @Secured("rewarding")
   @Operation(summary = "Retrieves a list of projects from crowdin", method = "GET")
   @ApiResponse(responseCode = "200", description = "Request fulfilled")
@@ -169,7 +167,8 @@ public class HooksManagementController {
   @ApiResponse(responseCode = "401", description = "Unauthorized")
   @ApiResponse(responseCode = "409", description = "Conflict")
   @ApiResponse(responseCode = "503", description = "Service unavailable")
-  public ResponseEntity<Object> createWebhookHook(@Parameter(description = "Crowdin project id", required = true) @RequestParam("projectId") Long projectId,
+  public ResponseEntity<Object> createWebhookHook(HttpServletRequest request,
+                                                  @Parameter(description = "Crowdin project id", required = true) @RequestParam("projectId") Long projectId,
                                                   @Parameter(description = "Crowdin project name", required = true) @RequestParam("projectName") String projectName,
                                                   @Parameter(description = "Crowdin personal access token", required = true) @RequestParam("accessToken") String accessToken) {
 
@@ -179,9 +178,8 @@ public class HooksManagementController {
     if (StringUtils.isBlank(accessToken)) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'accessToken' parameter is mandatory");
     }
-    String currentUser = ConversationState.getCurrent().getIdentity().getUserId();
     try {
-      webhookService.createWebhook(projectId, projectName, accessToken, currentUser);
+      webhookService.createWebhook(projectId, projectName, accessToken, request.getRemoteUser());
       return ResponseEntity.status(HttpStatus.CREATED).build();
     } catch (IllegalAccessException e) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
@@ -199,7 +197,8 @@ public class HooksManagementController {
   @ApiResponse(responseCode = "401", description = "Unauthorized")
   @ApiResponse(responseCode = "409", description = "Conflict")
   @ApiResponse(responseCode = "503", description = "Service unavailable")
-  public Response updateWebHookAccessToken(@Parameter(description = "webHook id", required = true) @RequestParam("webHookId") long webHookId,
+  public Response updateWebHookAccessToken(HttpServletRequest request,
+                                           @Parameter(description = "webHook id", required = true) @RequestParam("webHookId") long webHookId,
                                            @Parameter(description = "Crowdin personal access token", required = true) @RequestParam("accessToken") String accessToken) {
 
     if (webHookId <= 0) {
@@ -208,9 +207,8 @@ public class HooksManagementController {
     if (StringUtils.isBlank(accessToken)) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'accessToken' parameter is mandatory");
     }
-    String currentUser = ConversationState.getCurrent().getIdentity().getUserId();
     try {
-      webhookService.updateWebHookAccessToken(webHookId, accessToken, currentUser);
+      webhookService.updateWebHookAccessToken(webHookId, accessToken, request.getRemoteUser());
       return Response.status(Response.Status.CREATED).build();
     } catch (IllegalAccessException e) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
@@ -227,13 +225,13 @@ public class HooksManagementController {
   @ApiResponse(responseCode = "400", description = "Bad request")
   @ApiResponse(responseCode = "401", description = "Unauthorized")
   @ApiResponse(responseCode = "503", description = "Service unavailable")
-  public void deleteWebhookHook(@Parameter(description = "Crowdin project id", required = true) @PathVariable("projectId") long projectId) {
+  public void deleteWebhookHook(HttpServletRequest request,
+                                @Parameter(description = "Crowdin project id", required = true) @PathVariable("projectId") long projectId) {
     if (projectId <= 0) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "'hookName' parameter is mandatory");
     }
-    String currentUser = ConversationState.getCurrent().getIdentity().getUserId();
     try {
-      webhookService.deleteWebhook(projectId, currentUser);
+      webhookService.deleteWebhook(projectId, request.getRemoteUser());
     } catch (IllegalAccessException e) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
     } catch (ObjectNotFoundException e) {
@@ -244,7 +242,7 @@ public class HooksManagementController {
   private List<WebHookRestEntity> getWebHookRestEntities(String username,
                                                          boolean includeLanguages) throws IllegalAccessException {
     Collection<WebHook> webHooks = webhookService.getWebhooks(username, 0, 20, false);
-    return webHookBuilder.toRestEntities(webHooks, includeLanguages);
+    return WebHookBuilder.toRestEntities(crowdinConsumerStorage, webHooks, includeLanguages);
   }
 
 }
