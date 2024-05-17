@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 export function getProjects(accessToken, hookId) {
-  return fetch(`/gamification-crowdin/rest/crowdin/hooks/get-projects?accessToken=${accessToken || ''}&hookId=${hookId || ''}`  , {
+  return fetch(`/gamification-crowdin/rest/crowdin/hooks/projects?accessToken=${accessToken || ''}&hookId=${hookId || ''}`  , {
     method: 'GET',
     credentials: 'include',
   }).then((resp) => {

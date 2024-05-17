@@ -13,83 +13,86 @@ import java.util.Map;
 
 public class Utils {
 
-  private static final Log   LOG                                = ExoLogger.getLogger(Utils.class);
+  private static final Log     LOG                                = ExoLogger.getLogger(Utils.class);
 
-  public static final String CONNECTOR_NAME                     = "crowdin";
+  public static final String   CONNECTOR_NAME                     = "crowdin";
 
-  public static final String PROJECT_ID                         = "projectId";
+  public static final String[] CROWDIN_EVENTS                     = new String[] { "stringComment.created",
+      "stringComment.deleted", "suggestion.added", "suggestion.deleted", "suggestion.approved", "suggestion.disapproved" };
 
-  public static final String CROWDIN_CONNECTION_ERROR           = "crowdin.connectionError";
+  public static final String   PROJECT_ID                         = "projectId";
 
-  public static final String AUTHORIZATION                      = "Authorization";
+  public static final String   CROWDIN_CONNECTION_ERROR           = "crowdin.connectionError";
 
-  public static final String TOKEN                              = "Bearer ";
+  public static final String   AUTHORIZATION                      = "Authorization";
 
-  public static final String CROWDIN_API_URL                    = "https://api.crowdin.com/api/v2";
+  public static final String   TOKEN                              = "Bearer ";
 
-  public static final String PROJECTS                           = "/projects/";
+  public static final String   CROWDIN_API_URL                    = "https://api.crowdin.com/api/v2";
 
-  public static final String WEBHOOKS                           = "/webhooks/";
+  public static final String   PROJECTS                           = "/projects/";
 
-  public static final String AUTHORIZED_TO_ACCESS_CROWDIN_HOOKS = "The user is not authorized to access crowdin Hooks";
+  public static final String   WEBHOOKS                           = "/webhooks/";
 
-  public static final String GAMIFICATION_GENERIC_EVENT         = "exo.gamification.generic.action";
+  public static final String   AUTHORIZED_TO_ACCESS_CROWDIN_HOOKS = "The user is not authorized to access crowdin Hooks";
 
-  public static final String GAMIFICATION_CANCEL_EVENT          = "gamification.cancel.event.action";
+  public static final String   GAMIFICATION_GENERIC_EVENT         = "exo.gamification.generic.action";
 
-  public static final String STRING_COMMENT_CREATED_EVENT_NAME  = "stringCommentCreated";
+  public static final String   GAMIFICATION_CANCEL_EVENT          = "gamification.cancel.event.action";
 
-  public static final String SUGGESTION_ADDED_EVENT_NAME        = "suggestionAdded";
+  public static final String   STRING_COMMENT_CREATED_EVENT_NAME  = "stringCommentCreated";
 
-  public static final String SUGGESTION_APPROVED_EVENT_NAME     = "suggestionApproved";
+  public static final String   SUGGESTION_ADDED_EVENT_NAME        = "suggestionAdded";
 
-  public static final String APPROVE_SUGGESTION_EVENT_NAME      = "approveSuggestion";
+  public static final String   SUGGESTION_APPROVED_EVENT_NAME     = "suggestionApproved";
 
-  public static final String DIRECTORY_IDS                      = "directoryIds";
+  public static final String   APPROVE_SUGGESTION_EVENT_NAME      = "approveSuggestion";
 
-  public static final String DIRECTORY_ID                       = "directoryId";
+  public static final String   DIRECTORY_IDS                      = "directoryIds";
 
-  public static final String LANGUAGE_IDS                       = "languageIds";
+  public static final String   DIRECTORY_ID                       = "directoryId";
 
-  public static final String LANGUAGE_ID                        = "languageId";
+  public static final String   LANGUAGE_IDS                       = "languageIds";
 
-  public static final String MUST_BE_HUMAN                      = "mustBeHuman";
+  public static final String   LANGUAGE_ID                        = "languageId";
 
-  public static final String STRING                             = "string";
+  public static final String   MUST_BE_HUMAN                      = "mustBeHuman";
 
-  public static final String TARGET_LANGUAGE                    = "targetLanguage";
+  public static final String   STRING                             = "string";
 
-  public static final String PROJECT                            = "project";
+  public static final String   TARGET_LANGUAGE                    = "targetLanguage";
 
-  public static final String ID                                 = "id";
+  public static final String   PROJECT                            = "project";
 
-  public static final String FILE                               = "file";
+  public static final String   ID                                 = "id";
 
-  public static final String USER                               = "user";
+  public static final String   FILE                               = "file";
 
-  public static final String USERNAME                           = "username";
+  public static final String   USER                               = "user";
 
-  public static final String SOURCE_LANGUAGE_ID                 = "sourceLanguageId";
+  public static final String   USERNAME                           = "username";
 
-  public static final String IDENTIFIER                         = "identifier";
+  public static final String   SOURCE_LANGUAGE_ID                 = "sourceLanguageId";
 
-  public static final String PROVIDER                           = "provider";
+  public static final String   IDENTIFIER                         = "identifier";
 
-  public static final String COMMENT                            = "comment";
+  public static final String   PROVIDER                           = "provider";
 
-  public static final String COMMENT_CREATED_TRIGGER            = "stringComment.created";
+  public static final String   COMMENT                            = "comment";
 
-  public static final String COMMENT_DELETED_TRIGGER            = "stringComment.deleted";
+  public static final String   COMMENT_CREATED_TRIGGER            = "stringComment.created";
 
-  public static final String TRANSLATION                        = "translation";
+  public static final String   COMMENT_DELETED_TRIGGER            = "stringComment.deleted";
 
-  public static final String SUGGESTION_ADDED_TRIGGER           = "suggestion.added";
+  public static final String   TRANSLATION                        = "translation";
 
-  public static final String SUGGESTION_DELETED_TRIGGER         = "suggestion.deleted";
+  public static final String   SUGGESTION_ADDED_TRIGGER           = "suggestion.added";
 
-  public static final String SUGGESTION_APPROVED_TRIGGER        = "suggestion.approved";
+  public static final String   SUGGESTION_DELETED_TRIGGER         = "suggestion.deleted";
 
-  public static final String SUGGESTION_DISAPPROVED_TRIGGER     = "suggestion.disapproved";
+  public static final String   SUGGESTION_APPROVED_TRIGGER        = "suggestion.approved";
+
+  public static final String   SUGGESTION_DISAPPROVED_TRIGGER     = "suggestion.disapproved";
 
   private Utils() {
   }

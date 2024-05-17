@@ -73,7 +73,7 @@ public class CrowdinTriggerService {
 
   @ContainerTransactional
   @SuppressWarnings("unchecked")
-  private void handleTrigger(String bearerToken, String payload) {
+  public void handleTrigger(String bearerToken, String payload) {
 
     Map<String, Object> payloadMap = fromJsonStringToMap(payload);
 
@@ -106,7 +106,7 @@ public class CrowdinTriggerService {
     }
   }
 
-  private void processEvents(List<Event> events, String projectId) {
+  public void processEvents(List<Event> events, String projectId) {
     events.stream().filter(event -> isTriggerEnabled(event.getName(), projectId)).forEach(this::processEvent);
   }
 

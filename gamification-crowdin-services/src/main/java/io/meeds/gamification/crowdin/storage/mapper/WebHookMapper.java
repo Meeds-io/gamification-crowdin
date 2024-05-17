@@ -73,8 +73,11 @@ public class WebHookMapper {
     if (webhookEntity == null) {
       return null;
     }
-    IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
-    String watchedBy = identityManager.getIdentity(String.valueOf(webhookEntity.getWatchedBy())).getRemoteId();
+    String watchedBy = null;
+    if (webhookEntity.getWatchedBy() != null) {
+      IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
+      watchedBy = identityManager.getIdentity(String.valueOf(webhookEntity.getWatchedBy())).getRemoteId();
+    }
     return new WebHook(webhookEntity.getId(),
                        webhookEntity.getWebhookId(),
                        webhookEntity.getProjectId(),

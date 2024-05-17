@@ -44,9 +44,6 @@ public class WebhookService {
   @Autowired
   private WebHookStorage         webHookStorage;
 
-  private static final String[]  CROWDIN_EVENTS = new String[] { "stringComment.created", "stringComment.deleted",
-      "suggestion.added", "suggestion.deleted", "suggestion.approved", "suggestion.disapproved" };
-
   public List<RemoteProject> getProjectsFromWebhookId(long webHookId) throws IllegalAccessException, ObjectNotFoundException {
     WebHook webHook = webHookStorage.getWebHookById(webHookId);
     if (webHook == null) {
@@ -59,7 +56,7 @@ public class WebhookService {
     return crowdinConsumerStorage.getProjects(accessToken);
   }
 
-  public void createWebhook(long projectId,
+  public WebHook createWebhook(long projectId,
                             String projectName,
                             String accessToken,
                             String currentUser) throws ObjectAlreadyExistsException, IllegalAccessException {
@@ -77,8 +74,9 @@ public class WebhookService {
     if (webHook != null) {
       webHook.setProjectName(projectName);
       webHook.setWatchedBy(currentUser);
-      webHookStorage.saveWebHook(webHook);
+      return webHookStorage.saveWebHook(webHook);
     }
+    return null;
   }
 
   public void updateWebHookAccessToken(long webHookId, String accessToken, String currentUser) throws IllegalAccessException,
@@ -103,7 +101,7 @@ public class WebhookService {
     return getWebhooks(offset, limit, forceUpdate);
   }
 
-  public void deleteWebhookHook(long projectId, String currentUser) throws IllegalAccessException, ObjectNotFoundException {
+  public WebHook deleteWebhook(long projectId, String currentUser) throws IllegalAccessException, ObjectNotFoundException {
     if (!Utils.isRewardingManager(currentUser)) {
       throw new IllegalAccessException("The user is not authorized to delete Crowdin hook");
     }
@@ -113,12 +111,13 @@ public class WebhookService {
     }
     String response = crowdinConsumerStorage.deleteWebhook(webHook);
     if (response != null) {
-      deleteWebhook(projectId);
+      return deleteWebhook(projectId);
     }
+    return null;
   }
 
-  public void deleteWebhook(long projectId) {
-    webHookStorage.deleteWebHook(projectId);
+  public WebHook deleteWebhook(long projectId) {
+    return webHookStorage.deleteWebHook(projectId);
   }
 
   public List<WebHook> getWebhooks(int offset, int limit, boolean forceUpdate) {
