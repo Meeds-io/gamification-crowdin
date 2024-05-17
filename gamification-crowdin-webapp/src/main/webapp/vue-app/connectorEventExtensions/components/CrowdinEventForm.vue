@@ -239,7 +239,7 @@ export default {
       this.loadingProjects = true;
       return this.$crowdinConnectorService.getCrowdinWebHooks(null, null, true)
         .then(data => {
-          this.projects = data;
+          this.projects = data.webhooks;
         }).finally(() => {
           if (this.properties) {
             this.selected = this.projects.find(r => Number(r.projectId) === Number(this.properties.projectId));
