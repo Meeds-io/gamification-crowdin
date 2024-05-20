@@ -144,7 +144,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         deletable-chips
         @change="readySelection" />
     </template>
-    <div class="d-flex flex-row" v-if="selected">
+    <div class="d-flex flex-row" v-if="selected && needVerificationIsHuman">
       <v-card-text class="px-0 dark-grey-color font-weight-bold">
         {{ $t('gamification.event.form.human') }}
       </v-card-text>
@@ -157,36 +157,6 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
           @change="readySelection" />
       </div>
     </div>
-    <div class="d-flex flex-row" v-if="selected">
-      <v-card-text class="px-0 dark-grey-color font-weight-bold">
-        {{ $t('gamification.event.form.words.title') }}
-      </v-card-text>
-      <div class="d-flex flex-row">
-        <v-switch
-          v-model="rewardPerWords"
-          color="primary"
-          class="ma-auto"
-          hide-details
-          @change="changeRewardPerWords" />
-      </div>
-    </div>
-    <v-card
-      v-if="rewardPerWords"
-      flat
-      width="180"
-      class="d-flex flex-grow-1">
-      <v-text-field
-        v-model="counter"
-        class="mt-0 pt-0 me-2"
-        type="number"
-        outlined
-        dense
-        required>
-        <template #append-outer>
-          <label class="mt-1">{{ $t('gamification.event.form.words') }}</label>
-        </template>
-      </v-text-field>
-    </v-card>
   </v-app>
 </template>
 
@@ -200,7 +170,11 @@ export default {
     isEditing: {
       type: Boolean,
       default: false
-    }
+    },
+    trigger: {
+      type: String,
+      default: null
+    },
   },
   data() {
     return {
@@ -218,21 +192,23 @@ export default {
       anyLanguage: false,
       hasMore: false,
       allowOnlyHuman: true,
-      rewardPerWords: false,
-      counter: 0,
     };
   },
-  created() {
-    this.retrieveProjects();
+  computed: {
+    needVerificationIsHuman() {
+      return this.trigger !== 'stringCommentCreated';
+    }
   },
   watch: {
     value() {
-      console.log('value: watch');
       this.selected = this.projects[this.value];
       if (this.selected) {
         this.retrieveDirectories();
       }
     },
+  },
+  created() {
+    this.retrieveProjects();
   },
   methods: {
     retrieveProjects() {
@@ -246,7 +222,7 @@ export default {
             this.value = this.projects.indexOf(this.selected);
             this.anyDir = !this.properties?.directoryIds;
             this.anyLanguage = !this.properties?.languageIds;
-            this.allowOnlyHuman = this.properties?.mustBeHuman === 'true';
+            this.allowOnlyHuman = this.properties?.mustBeHuman === 'true' || true;
           } else if (this.projects.length > 0) {
             this.selected = this.projects[0];
             this.value = this.projects.indexOf(this.selected);
@@ -301,7 +277,11 @@ export default {
       if (this.selectedLanguages.length) {
         eventProperties.languageIds = this.selectedLanguages.toString();
       }
-      document.dispatchEvent(new CustomEvent('event-form-filled', {detail: eventProperties}));
+      if ((this.anyDir || this.selectedDirectories.length) && (this.anyLanguage || this.selectedLanguages.length)) {
+        document.dispatchEvent(new CustomEvent('event-form-filled', {detail: eventProperties}));
+      } else {
+        document.dispatchEvent(new CustomEvent('event-form-unfilled'));
+      }
     },
     changeDirectorySelection() {
       this.selectedDirectories = [];
@@ -330,9 +310,6 @@ export default {
       this.anyLanguage = true;
       this.selected = this.projects.find(obj => obj.id === projectId);
       this.readySelection();
-    },
-    changeRewardPerWords(rewardPerWords) {
-      console.log(`rewardPerWords : ${rewardPerWords}`);
     },
     getAvatarUrl(item) {
       if (item?.avatarUrl) {
