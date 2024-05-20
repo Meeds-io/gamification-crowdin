@@ -16,9 +16,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import CrowdinConnectorEventForm from './components/CrowdinEventForm.vue';
+import CrowdinProjectItem from './components/CrowdinProjectItem.vue';
 
 const components = {
-  'crowdin-connector-event-form': CrowdinConnectorEventForm
+  'crowdin-connector-event-form': CrowdinConnectorEventForm,
+  'crowdin-connector-project-item': CrowdinProjectItem
 };
 
 for (const key in components) {
