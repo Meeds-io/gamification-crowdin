@@ -57,10 +57,13 @@
                     {{ $t('crowdinConnector.admin.label.accessToken.instructions.stepThree') }} :
                   </v-card-text>
                   <span class="pt-0 ps-0 text-color">
-                    - Projects (List, Get, Create, Edit)
+                    - {{ $t('crowdinConnector.admin.label.accessTokenScopeOne') }}
                   </span>
                   <span class="pt-0 ps-0 text-color">
-                    - Projects Webhooks
+                    - {{ $t('crowdinConnector.admin.label.accessTokenScopeTwo') }}
+                  </span>
+                  <span class="pt-0 ps-0 text-color">
+                    - {{ $t('crowdinConnector.admin.label.accessTokenScopeThree') }}
                   </span>
                 </div>
                 <div class="d-flex flex-column py-0">
