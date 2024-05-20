@@ -66,7 +66,7 @@ export function getWebHookDirectories(projectId, offset, limit) {
     if (resp?.ok) {
       return resp.json();
     } else {
-      throw new Error('Error when getting github webhooks');
+      throw new Error('Error when getting crowdin webhook directories');
     }
   });
 }
