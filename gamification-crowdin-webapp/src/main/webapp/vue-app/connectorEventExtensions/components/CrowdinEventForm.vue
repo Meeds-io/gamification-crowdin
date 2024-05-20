@@ -27,51 +27,16 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
       color="primary"
       size="20"
       class="ms-3 my-auto" />
-    <v-autocomplete
-      v-if="!loadingProjects"
-      id="projectAutoComplete"
-      ref="projectAutoComplete"
-      v-model="selected"
-      :items="projects"
-      :placeholder="$t('gamification.event.form.project.placeholder')"
-      class="pa-0"
-      background-color="white"
-      item-value="id"
-      item-text="name"
-      dense
-      flat
-      solo
-      outlined
-      @change="projectSelected">
-      <template #selection="{item, selected}">
-        <v-chip
-          :input-value="selected"
-          color="white">
-          <img
-            :src="getAvatarUrl(item)"
-            :alt="item.name"
-            width="28">
-          <v-tooltip bottom>
-            <template #activator="{ on }">
-              <span v-on="on" class="text-truncate">&nbsp;&nbsp;{{ item.name }}
-              </span>
-            </template>
-            <span>{{ item.name }}</span>
-          </v-tooltip>
-        </v-chip>
-      </template>
-      <template #item="{item}">
-        <img
-          :src="getAvatarUrl(item)"
-          :alt="item.name"
-          width="28">
-        <v-list-item-content>
-          <v-list-item-title>
-            &nbsp;&nbsp;{{ item.name }}
-          </v-list-item-title>
-        </v-list-item-content>
-      </template>
-    </v-autocomplete>
+    <v-chip-group
+      v-model="value"
+      :show-arrows="false"
+      active-class="primary white--text">
+      <crowdin-connector-project-item
+        v-for="project in projects"
+        :key="project.id"
+        :project="project"
+        @handle="selectProject(project)" />
+    </v-chip-group>
     <template v-if="selected">
       <div class="d-flex flex-row">
         <v-card-text class="px-0 dark-grey-color font-weight-bold">
@@ -300,23 +265,16 @@ export default {
         document.dispatchEvent(new CustomEvent('event-form-unfilled'));
       }
     },
-    projectSelected(projectId) {
+    selectProject(project) {
+      this.allowOnlyHuman = true;
+      this.offset = 0;
       this.directories = [];
       this.selectedDirectories = [];
       this.selectedLanguages = [];
-      this.allowOnlyHuman = true;
-      this.offset = 0;
       this.anyDir = true;
       this.anyLanguage = true;
-      this.selected = this.projects.find(obj => obj.id === projectId);
+      this.selected = project;
       this.readySelection();
-    },
-    getAvatarUrl(item) {
-      if (item?.avatarUrl) {
-        return `${item.avatarUrl}?version=${new Date().getTime()}`;
-      } else {
-        return '/gamification-crowdin/images/crowdin.png';
-      }
     }
   }
 };
