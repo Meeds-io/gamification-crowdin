@@ -242,9 +242,7 @@ export default {
       this.displayHookDetail = true;
     },
     forceUpdateWebhooks() {
-      return this.$crowdinConnectorService.forceUpdateWebhooks().then(() => {
-        this.$root.$emit('crowdin-hooks-updated');
-      });
+      this.$root.$emit('crowdin-hooks-force-updated');
     },
     webhooksUpdated(webhooks){
       this.webhooks = webhooks;

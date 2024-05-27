@@ -15,11 +15,17 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import CrowdinConnectorEvent from './components/CrowdinEvent.vue';
 import CrowdinConnectorEventForm from './components/CrowdinEventForm.vue';
+import CrowdinConnectorEventDisplay from './components/CrowdinEventDisplay.vue';
+import CrowdinEventDisplayProjectItem from './components/CrowdinEventDisplayProjectItem.vue';
 import CrowdinProjectItem from './components/CrowdinProjectItem.vue';
 
 const components = {
+  'crowdin-connector-event': CrowdinConnectorEvent,
   'crowdin-connector-event-form': CrowdinConnectorEventForm,
+  'crowdin-connector-event-display': CrowdinConnectorEventDisplay,
+  'crowdin-connector-event-display-project-item': CrowdinEventDisplayProjectItem,
   'crowdin-connector-project-item': CrowdinProjectItem
 };
 

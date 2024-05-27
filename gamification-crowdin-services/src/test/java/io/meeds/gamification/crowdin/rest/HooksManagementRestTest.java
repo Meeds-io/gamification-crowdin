@@ -18,6 +18,10 @@
  */
 package io.meeds.gamification.crowdin.rest;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,6 +51,8 @@ import io.meeds.spring.web.security.PortalAuthenticationManager;
 import io.meeds.spring.web.security.WebSecurityConfiguration;
 
 import jakarta.servlet.Filter;
+
+import java.util.List;
 
 @SpringBootTest(classes = { HooksManagementRest.class, PortalAuthenticationManager.class, })
 @ContextConfiguration(classes = { WebSecurityConfiguration.class })
@@ -133,14 +139,15 @@ class HooksManagementRestTest {
     ResultActions response = mockMvc.perform(get(HOOKS_PATH + "/4/directories").param("offset", "0")
                                                                                .param("limit", "10")
                                                                                .with(testSimpleUser()));
-    response.andExpect(status().isForbidden());
-  }
+    verify(webhookService, times(1)).getProjectDirectories(4L, SIMPLE_USER, 0, 10);
+    response.andExpect(status().isOk());
 
-  @Test
-  void getProjectDirectoriesAdmin() throws Exception {
-    ResultActions response = mockMvc.perform(get(HOOKS_PATH + "/4/directories").param("offset", "0")
-                                                                               .param("limit", "10")
-                                                                               .with(testAdminUser()));
+    response = mockMvc.perform(get(HOOKS_PATH + "/4/directories").param("offset", "0")
+            .param("limit", "10")
+            .param("directoryId", "124")
+            .param("directoryId", "155")
+            .with(testSimpleUser()));
+    verify(webhookService, times(1)).getProjectDirectoriesByIds(4L, List.of(124L, 155L));
     response.andExpect(status().isOk());
   }
 

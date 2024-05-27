@@ -24,7 +24,6 @@ import io.meeds.gamification.crowdin.model.WebHook;
 import io.meeds.gamification.crowdin.storage.mapper.WebHookMapper;
 import org.exoplatform.commons.ObjectAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
@@ -69,9 +68,12 @@ public class WebHookStorage {
   }
 
   public List<WebHook> getWebhooks(int offset, int limit) {
-    PageRequest pageable = PageRequest.of(Math.toIntExact(offset / limit), limit, Sort.by(Sort.Direction.ASC, "id"));
-    Page<WebhookEntity> webhooks = webHookDAO.findAll(pageable);
-    return webhooks.getContent().stream().map(WebHookMapper::fromEntity).toList();
+    if (limit > 0) {
+      PageRequest pageable = PageRequest.of(Math.toIntExact(offset / limit), limit, Sort.by(Sort.Direction.ASC, "id"));
+      return webHookDAO.findAll(pageable).getContent().stream().map(WebHookMapper::fromEntity).toList();
+    } else {
+      return webHookDAO.findAll().stream().map(WebHookMapper::fromEntity).toList();
+    }
   }
 
   public WebHook getWebhookByProjectId(long projectId) {
