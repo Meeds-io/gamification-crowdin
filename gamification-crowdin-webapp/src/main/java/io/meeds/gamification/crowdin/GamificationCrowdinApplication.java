@@ -19,6 +19,7 @@
 package io.meeds.gamification.crowdin;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.PropertySource;
 
 import io.meeds.spring.AvailableIntegration;
@@ -30,10 +31,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
     AvailableIntegration.KERNEL_MODULE,
     AvailableIntegration.JPA_MODULE,
     AvailableIntegration.LIQUIBASE_MODULE,
-    AvailableIntegration.WEB_SECURITY_MODULE,
-    AvailableIntegration.WEB_TRANSACTION_MODULE,
+    AvailableIntegration.WEB_MODULE,
   })
 @EnableJpaRepositories(basePackages = GamificationCrowdinApplication.MODULE_NAME)
+@EnableCaching
 @PropertySource("classpath:application.properties")
 @PropertySource("classpath:application-common.properties")
 @PropertySource("classpath:crowdin.properties")

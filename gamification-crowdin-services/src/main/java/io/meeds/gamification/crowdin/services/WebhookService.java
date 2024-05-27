@@ -29,6 +29,7 @@ import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.meeds.gamification.crowdin.utils.Utils.*;
@@ -142,6 +143,28 @@ public class WebhookService {
     }
 
     return crowdinConsumerStorage.getProjectDirectories(remoteProjectId, offset, limit, existsWebHook.getToken());
+  }
+
+  public List<RemoteDirectory> getProjectDirectoriesByIds(long remoteProjectId,
+                                                          List<Long> remoteDirectoryIds) throws ObjectNotFoundException {
+
+    WebHook existsWebHook = webHookStorage.getWebhookByProjectId(remoteProjectId);
+    if (existsWebHook == null) {
+      throw new ObjectNotFoundException("Webhook with project id '" + remoteProjectId + "' doesn't exist");
+    }
+
+    List<RemoteDirectory> directories = new ArrayList<>();
+    for (Long directoryId : remoteDirectoryIds) {
+      try {
+        RemoteDirectory directory = crowdinConsumerStorage.getProjectDirectoryById(remoteProjectId,
+                                                                                   directoryId,
+                                                                                   existsWebHook.getToken());
+        directories.add(directory);
+      } catch (IllegalAccessException e) {
+        throw new IllegalStateException();
+      }
+    }
+    return directories;
   }
 
   public void forceUpdateWebhooks() {

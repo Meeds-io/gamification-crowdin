@@ -96,16 +96,17 @@ export default {
     }
   },
   created() {
-    this.$root.$on('crowdin-hooks-updated', this.refreshHooks);
+    this.$root.$on('crowdin-hooks-updated', this.refreshHooks());
+    this.$root.$on('crowdin-hooks-force-updated', this.refreshHooks(true));
     if (!this.apiKey && !this.secretKey && !this.redirectUrl) {
       this.editing = true;
     }
     this.refreshHooks();
   },
   methods: {
-    refreshHooks() {
+    refreshHooks(forceUpdate) {
       this.loading = true;
-      return this.$crowdinConnectorService.getCrowdinWebHooks(this.offset, this.limit, false)
+      return this.$crowdinConnectorService.getCrowdinWebHooks(this.offset, this.limit, false, forceUpdate)
         .then(data => {
           this.hooks = data.webhooks;
           this.hooksCount = data.size || 0;

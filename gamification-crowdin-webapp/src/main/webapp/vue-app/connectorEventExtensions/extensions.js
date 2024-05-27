@@ -23,7 +23,7 @@ export function init() {
   extensionRegistry.registerComponent('engagementCenterEvent', 'connector-event-extensions', {
     id: 'crowdin-event',
     name: 'crowdin',
-    vueComponent: Vue.options.components['crowdin-connector-event-form'],
+    vueComponent: Vue.options.components['crowdin-connector-event'],
     isEnabled: (params) => [
       'stringCommentCreated',
       'suggestionAdded',
