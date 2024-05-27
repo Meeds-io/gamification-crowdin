@@ -17,7 +17,7 @@ along with this program; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
-  <v-app v-if="isEditing">
+  <v-app>
     <v-card-text class="px-0 dark-grey-color font-weight-bold">
       {{ $t('gamification.event.form.project') }}
     </v-card-text>
@@ -132,10 +132,6 @@ export default {
       type: Object,
       default: null
     },
-    isEditing: {
-      type: Boolean,
-      default: false
-    },
     trigger: {
       type: String,
       default: null
@@ -215,7 +211,7 @@ export default {
     retrieveDirectories() {
       const offset = this.offset || 0;
       const limit = this.limit || 25;
-      return this.$crowdinConnectorService.getWebHookDirectories(this.selected?.projectId, offset, limit)
+      return this.$crowdinConnectorService.getWebHookDirectories(this.selected?.projectId, null, offset, limit)
         .then(data => {
           this.directories.push(...data);
 

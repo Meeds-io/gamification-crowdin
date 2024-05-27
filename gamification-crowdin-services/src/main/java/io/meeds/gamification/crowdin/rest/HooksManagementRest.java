@@ -33,10 +33,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.ObjectAlreadyExistsException;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
-import org.exoplatform.services.security.ConversationState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -68,15 +68,16 @@ public class HooksManagementRest {
   @Operation(summary = "Retrieves the list Crowdin webHooks", method = "GET")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
                           @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public WebHookList getWebHooks(@RequestParam("offset") int offset,
+  public WebHookList getWebHooks(HttpServletRequest request,
+                                 @Parameter(description = "Offset") @RequestParam("offset") int offset,
                                  @Parameter(description = "Query results limit", required = true) @RequestParam("limit") int limit,
+                                 @Parameter(description = "force update remote project info") @RequestParam(value = "forceUpdate", defaultValue = "false", required = false) boolean forceUpdate,
                                  @Parameter(description = "Include languages") @Schema(defaultValue = "false") @RequestParam("includeLanguages") boolean includeLanguages) {
 
-    String currentUser = getCurrentUser();
     List<WebHookRestEntity> webHookRestEntities;
     try {
       WebHookList webHookList = new WebHookList();
-      webHookRestEntities = getWebHookRestEntities(currentUser, includeLanguages);
+      webHookRestEntities = getWebHookRestEntities(request.getRemoteUser(), includeLanguages, forceUpdate);
       webHookList.setWebhooks(webHookRestEntities);
       webHookList.setOffset(offset);
       webHookList.setLimit(limit);
@@ -111,7 +112,7 @@ public class HooksManagementRest {
   }
 
   @GetMapping("{projectId}/directories")
-  @Secured("rewarding")
+  @Secured("users")
   @Operation(summary = "Retrieves a list of project directories from crowdin", method = "GET")
   @ApiResponse(responseCode = "200", description = "Request fulfilled")
   @ApiResponse(responseCode = "404", description = "Not found")
@@ -120,9 +121,13 @@ public class HooksManagementRest {
   @ApiResponse(responseCode = "503", description = "Service unavailable")
   public List<RemoteDirectory> getProjectDirectories(HttpServletRequest request,
                                                      @Parameter(description = "Remote project identifier", required = true) @PathVariable("projectId") long projectId,
-                                                     @RequestParam("offset") int offset,
-                                                     @Parameter(description = "Query results limit") @RequestParam("limit") int limit) {
+                                                     @Parameter(description = "Used to filter directory by ids") @RequestParam(value = "directoryId", required = false) List<Long> directoryIds,
+                                                     @Parameter(description = "Query Offset") @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
+                                                     @Parameter(description = "Query results limit") @RequestParam(value = "limit", required = false, defaultValue = "0") int limit) {
     try {
+      if (CollectionUtils.isNotEmpty(directoryIds)) {
+        return webhookService.getProjectDirectoriesByIds(projectId, directoryIds);
+      }
       return webhookService.getProjectDirectories(projectId, request.getRemoteUser(), offset, limit);
     } catch (IllegalArgumentException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -240,8 +245,9 @@ public class HooksManagementRest {
   }
 
   private List<WebHookRestEntity> getWebHookRestEntities(String username,
-                                                         boolean includeLanguages) throws IllegalAccessException {
-    Collection<WebHook> webHooks = webhookService.getWebhooks(username, 0, 20, false);
+                                                         boolean includeLanguages,
+                                                         boolean forceUpdate) throws IllegalAccessException {
+    Collection<WebHook> webHooks = webhookService.getWebhooks(username, 0, 20, forceUpdate);
     return WebHookBuilder.toRestEntities(crowdinConsumerStorage, webHooks, includeLanguages);
   }
 
