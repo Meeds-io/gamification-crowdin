@@ -99,7 +99,7 @@ export default {
       } else {
         objects.push({ project: this.project });
       }
-      return objects;
+      return objects.sort((a, b) => `${a?.directory}/${a?.language}`.localeCompare(`${b?.directory}/${b?.language}`));
     }
   },
   created() {

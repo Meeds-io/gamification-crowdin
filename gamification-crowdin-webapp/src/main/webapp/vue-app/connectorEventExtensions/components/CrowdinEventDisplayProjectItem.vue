@@ -20,11 +20,10 @@
   <v-list-item class="clickable mb-2" :href="projectUrl">
     <v-list-item-icon class="me-3 my-auto">
       <v-avatar
-        size="22"
-        class="border-color"
+        size="24"
         rounded
         left>
-        <v-img :width="22" :src="avatarUrl" />
+        <v-img :width="24" :src="avatarUrl" />
       </v-avatar>
     </v-list-item-icon>
     <v-list-item-content>
