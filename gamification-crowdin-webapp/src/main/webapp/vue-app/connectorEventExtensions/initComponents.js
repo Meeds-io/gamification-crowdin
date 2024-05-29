@@ -20,13 +20,15 @@ import CrowdinConnectorEventForm from './components/CrowdinEventForm.vue';
 import CrowdinConnectorEventDisplay from './components/CrowdinEventDisplay.vue';
 import CrowdinEventDisplayProjectItem from './components/CrowdinEventDisplayProjectItem.vue';
 import CrowdinProjectItem from './components/CrowdinProjectItem.vue';
+import CrowdinSelectDirectoryDrawer from './components/CrowdinSelectDirectoryDrawer.vue';
 
 const components = {
   'crowdin-connector-event': CrowdinConnectorEvent,
   'crowdin-connector-event-form': CrowdinConnectorEventForm,
   'crowdin-connector-event-display': CrowdinConnectorEventDisplay,
   'crowdin-connector-event-display-project-item': CrowdinEventDisplayProjectItem,
-  'crowdin-connector-project-item': CrowdinProjectItem
+  'crowdin-connector-project-item': CrowdinProjectItem,
+  'crowdin-connector-select-directory-drawer': CrowdinSelectDirectoryDrawer
 };
 
 for (const key in components) {

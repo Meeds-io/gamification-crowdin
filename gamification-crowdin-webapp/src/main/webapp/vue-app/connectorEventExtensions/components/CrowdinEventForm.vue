@@ -19,7 +19,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 <template>
   <v-app>
     <v-card-text class="px-0 dark-grey-color font-weight-bold">
-      {{ $t('gamification.event.form.project') }}
+      {{ $t('gamification.crowdin.event.form.project') }}
     </v-card-text>
     <v-progress-circular
       v-if="loadingProjects"
@@ -40,10 +40,10 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
     <template v-if="selected">
       <div class="d-flex flex-row">
         <v-card-text class="px-0 dark-grey-color font-weight-bold">
-          {{ $t('gamification.event.form.directory') }}
+          {{ $t('gamification.crowdin.event.form.directory') }}
         </v-card-text>
         <div class="d-flex flex-row">
-          <div class="ma-auto"> {{ $t('gamification.event.form.any') }}</div>
+          <div class="ma-auto"> {{ $t('gamification.crowdin.event.form.any') }}</div>
           <v-checkbox
             v-model="anyDir"
             class="mt-0 pt-0 align-center"
@@ -53,33 +53,40 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             @click="changeDirectorySelection" />
         </div>
       </div>
-      <v-autocomplete
-        v-if="!anyDir"
-        id="directoryAutoComplete"
-        ref="directoryAutoComplete"
-        v-model="selectedDirectories"
-        :items="directories"
-        :disabled="anyDir"
-        :placeholder="$t('gamification.event.form.directory.placeholder')"
-        class="pa-0"
-        background-color="white"
-        item-value="id"
-        item-text="path"
-        dense
-        flat
-        outlined
-        multiple
-        chips
-        deletable-chips
-        @change="readySelection" />
+      <v-template v-if="!anyDir && selectedDirectoriesToDisplay.length > 0">
+        <div class="d-flex flex-row justify-space-between">
+          <div>
+            <v-chip v-if="selectedDirectoriesToDisplay[0]?.path" class="mask-color">
+              {{ selectedDirectoriesToDisplay[0].path }}
+            </v-chip>
+            <v-chip v-if="selectedDirectoriesToDisplay[1]?.path" class="mask-color">
+              {{ selectedDirectoriesToDisplay[1].path }}
+            </v-chip>
+            <v-chip
+              v-if="selectedDirectoriesToDisplay.length > 2"
+              class="mask-color">
+              +1
+            </v-chip>
+          </div>
+          <v-btn
+            icon>
+            <v-icon
+              color="primary"
+              size="18"
+              @click="changeDirectorySelection">
+              fas fa-edit
+            </v-icon>
+          </v-btn>
+        </div>
+      </v-template>
     </template>
     <template v-if="selected">
       <div class="d-flex flex-row">
         <v-card-text class="px-0 dark-grey-color font-weight-bold">
-          {{ $t('gamification.event.form.language') }}
+          {{ $t('gamification.crowdin.event.form.language') }}
         </v-card-text>
         <div class="d-flex flex-row">
-          <div class="ma-auto"> {{ $t('gamification.event.form.any') }}</div>
+          <div class="ma-auto"> {{ $t('gamification.crowdin.event.form.any') }}</div>
           <v-checkbox
             v-model="anyLanguage"
             class="mt-0 pt-0 align-center"
@@ -96,7 +103,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         v-model="selectedLanguages"
         :items="languages"
         :disabled="anyLanguage"
-        :placeholder="$t('gamification.event.form.language.placeholder')"
+        :placeholder="$t('gamification.crowdin.event.form.language.placeholder')"
         class="pa-0"
         background-color="white"
         item-value="id"
@@ -111,7 +118,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
     </template>
     <div class="d-flex flex-row" v-if="selected && needVerificationIsHuman">
       <v-card-text class="px-0 dark-grey-color font-weight-bold">
-        {{ $t('gamification.event.form.human') }}
+        {{ $t('gamification.crowdin.event.form.human') }}
       </v-card-text>
       <div class="d-flex flex-row">
         <v-switch
@@ -122,6 +129,10 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
           @change="readySelection" />
       </div>
     </div>
+    <crowdin-connector-select-directory-drawer
+      :directories="directories"
+      :selected-directories="selectedDirectories"
+      @apply="selectDirectories" />
   </v-app>
 </template>
 
@@ -140,7 +151,7 @@ export default {
   data() {
     return {
       offset: 0,
-      limit: 25,
+      limit: 500,
       projects: [],
       selected: null,
       directories: [],
@@ -153,12 +164,19 @@ export default {
       anyLanguage: false,
       hasMore: false,
       allowOnlyHuman: true,
+      selectedDirectoriesToDisplay: []
     };
   },
   computed: {
     needVerificationIsHuman() {
       return this.trigger !== 'stringCommentCreated';
-    }
+    },
+    directoryIds() {
+      return this.properties?.directoryIds?.split(',').map(Number);
+    },
+    treeDirectories() {
+      return this.buildTree(this.directories);
+    },
   },
   watch: {
     value() {
@@ -224,6 +242,7 @@ export default {
                 }
               }
             });
+            this.selectedDirectoriesToDisplay = this.processItems(this.treeDirectories, this.selectedDirectories);
           }
         });
     },
@@ -232,7 +251,7 @@ export default {
         projectId: this.selected?.projectId.toString(),
         mustBeHuman: this.allowOnlyHuman
       };
-      if (this.selectedDirectories.length) {
+      if (this.selectedDirectories?.length) {
         eventProperties.directoryIds = this.selectedDirectories.toString();
       }
       if (this.selectedLanguages.length) {
@@ -245,12 +264,19 @@ export default {
       }
     },
     changeDirectorySelection() {
-      this.selectedDirectories = [];
-      if (this.anyDir) {
+      if (!this.anyDir) {
+        this.$root.$emit('directory-selection-drawer-open');
+      } else {
+        document.dispatchEvent(new CustomEvent('event-form-filled'));}
+    },
+    selectDirectories(directories) {
+      if (directories.length > 0) {
+        this.selectedDirectories = directories;
+        this.selectedDirectoriesToDisplay = this.processItems(this.treeDirectories, this.selectedDirectories);
         this.readySelection();
       } else {
-        this.retrieveDirectories();
-        document.dispatchEvent(new CustomEvent('event-form-unfilled'));
+        this.anyDir = true;
+        document.dispatchEvent(new CustomEvent('event-form-filled'));
       }
     },
     changeLanguageSelection() {
@@ -271,6 +297,56 @@ export default {
       this.anyLanguage = true;
       this.selected = project;
       this.readySelection();
+    },
+    buildTree() {
+      const tree = [];
+      const lookup = {};
+      this.directories?.forEach((dir) => {
+        const parts = dir.path.split('/').filter(Boolean);
+        let currentLevel = tree;
+        parts.forEach((part) => {
+          if (!lookup[part]) {
+            const node = {
+              id: dir.id,
+              path: part,
+              children: [],
+            };
+            lookup[part] = node;
+            currentLevel.push(node);
+          }
+          currentLevel = lookup[part].children;
+        });
+      });
+      return tree;
+    },
+    processItems(items, idList) {
+      const idSet = new Set(idList);
+      const result = [];
+      items.filter(item => (idSet.has(item.id) || item.children.length > 0)).forEach(item => {
+        result.push(...this.processItem(item, idSet));
+      });
+      return result;
+    },
+    hasAllChildrenListed(item, idSet) {
+      if (item.children && item.children.length > 0) {
+        return item.children.every(child => idSet.has(child.id));
+      }
+      return true;
+    },
+    processItem(item, idSet) {
+      if (this.hasAllChildrenListed(item, idSet)) {
+        return [{ id: item.id, path: item.path }];
+      } else {
+        const results = [];
+        item.children.filter(item => (idSet.has(item.id) || item.children.length > 0)).forEach(child => {
+          if (this.hasAllChildrenListed(child, idSet)) {
+            results.push({ id: child.id, path: child.path });
+          } else {
+            results.push(...this.processItem(child, idSet));
+          }
+        });
+        return results;
+      }
     }
   }
 };

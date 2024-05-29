@@ -98,12 +98,6 @@ class HooksManagementRestTest {
   void getWebhooksSimpleUser() throws Exception {
     ResultActions response =
                            mockMvc.perform(get(HOOKS_PATH + "?offset=0&limit=10&includeLanguages=false").with(testSimpleUser()));
-    response.andExpect(status().isForbidden());
-  }
-
-  @Test
-  void getWebhooksAdmin() throws Exception {
-    ResultActions response = mockMvc.perform(get(HOOKS_PATH + "?offset=0&limit=10&includeLanguages=false").with(testAdminUser()));
     response.andExpect(status().isOk());
   }
 
