@@ -17,7 +17,10 @@
  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
-  <v-list-item class="clickable mb-2" :href="projectUrl">
+  <v-list-item
+    class="clickable mb-2"
+    :href="projectUrl"
+    target="_blank">
     <v-list-item-icon class="me-3 my-auto">
       <v-avatar
         size="24"
@@ -48,6 +51,9 @@ export default {
     project() {
       return this.item?.project;
     },
+    projectTitle() {
+      return this.project?.title;
+    },
     projectName() {
       return this.project?.name;
     },
@@ -65,10 +71,10 @@ export default {
       }
     },
     projectUrl() {
-      return this.project && `https://crowdin.com/project/${this.projectName}/${this.language ? this.language : 'en'}#${this.directory ? `/${this.directory}` : ''}`;
+      return this.project && `https://crowdin.com/project/${this.projectTitle}/${this.language ? this.language : 'en'}#${this.directory ? `/${this.directory}` : ''}`;
     },
     title() {
-      return `${this.project?.title || this.project?.name} ${this.directory ? `- ${this.directory}` : ''} ${this.language ? `/ ${this.language?.toUpperCase()}` : '' }`;
+      return `${this.projectName || this.projectTitle} ${this.directory ? `- ${this.directory}` : ''} ${this.language ? `/ ${this.language?.toUpperCase()}` : '' }`;
     },
   },
 };
