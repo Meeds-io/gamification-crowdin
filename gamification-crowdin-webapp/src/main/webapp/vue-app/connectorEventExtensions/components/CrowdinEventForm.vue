@@ -56,10 +56,10 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
       <v-template v-if="!anyDir && selectedDirectoriesToDisplay.length > 0">
         <div class="d-flex flex-row justify-space-between">
           <div>
-            <v-chip v-if="selectedDirectoriesToDisplay[0]?.path" class="mask-color">
+            <v-chip v-if="selectedDirectoriesToDisplay[0]?.path" class="mask-color" dark>
               {{ selectedDirectoriesToDisplay[0].path }}
             </v-chip>
-            <v-chip v-if="selectedDirectoriesToDisplay[1]?.path" class="mask-color">
+            <v-chip v-if="selectedDirectoriesToDisplay[1]?.path" class="mask-color" dark>
               {{ selectedDirectoriesToDisplay[1].path }}
             </v-chip>
             <v-chip
@@ -174,9 +174,6 @@ export default {
     directoryIds() {
       return this.properties?.directoryIds?.split(',').map(Number);
     },
-    treeDirectories() {
-      return this.buildTree(this.directories);
-    },
   },
   watch: {
     value() {
@@ -228,7 +225,7 @@ export default {
     },
     retrieveDirectories() {
       const offset = this.offset || 0;
-      const limit = this.limit || 25;
+      const limit = this.limit || 500;
       return this.$crowdinConnectorService.getWebHookDirectories(this.selected?.projectId, null, offset, limit)
         .then(data => {
           this.directories.push(...data);
@@ -242,7 +239,7 @@ export default {
                 }
               }
             });
-            this.selectedDirectoriesToDisplay = this.processItems(this.treeDirectories, this.selectedDirectories);
+            this.selectedDirectoriesToDisplay = this.$crowdinUtils.processItems(this.$crowdinUtils.buildTree(this.directories), this.selectedDirectories);
           }
         });
     },
@@ -272,7 +269,7 @@ export default {
     selectDirectories(directories) {
       if (directories.length > 0) {
         this.selectedDirectories = directories;
-        this.selectedDirectoriesToDisplay = this.processItems(this.treeDirectories, this.selectedDirectories);
+        this.selectedDirectoriesToDisplay = this.$crowdinUtils.processItems(this.$crowdinUtils.buildTree(this.directories), this.selectedDirectories);
         this.readySelection();
       } else {
         this.anyDir = true;
@@ -298,56 +295,6 @@ export default {
       this.selected = project;
       this.readySelection();
     },
-    buildTree() {
-      const tree = [];
-      const lookup = {};
-      this.directories?.forEach((dir) => {
-        const parts = dir.path.split('/').filter(Boolean);
-        let currentLevel = tree;
-        parts.forEach((part) => {
-          if (!lookup[part]) {
-            const node = {
-              id: dir.id,
-              path: part,
-              children: [],
-            };
-            lookup[part] = node;
-            currentLevel.push(node);
-          }
-          currentLevel = lookup[part].children;
-        });
-      });
-      return tree;
-    },
-    processItems(items, idList) {
-      const idSet = new Set(idList);
-      const result = [];
-      items.filter(item => (idSet.has(item.id) || item.children.length > 0)).forEach(item => {
-        result.push(...this.processItem(item, idSet));
-      });
-      return result;
-    },
-    hasAllChildrenListed(item, idSet) {
-      if (item.children && item.children.length > 0) {
-        return item.children.every(child => idSet.has(child.id));
-      }
-      return true;
-    },
-    processItem(item, idSet) {
-      if (this.hasAllChildrenListed(item, idSet)) {
-        return [{ id: item.id, path: item.path }];
-      } else {
-        const results = [];
-        item.children.filter(item => (idSet.has(item.id) || item.children.length > 0)).forEach(child => {
-          if (this.hasAllChildrenListed(child, idSet)) {
-            results.push({ id: child.id, path: child.path });
-          } else {
-            results.push(...this.processItem(child, idSet));
-          }
-        });
-        return results;
-      }
-    }
   }
 };
 </script>

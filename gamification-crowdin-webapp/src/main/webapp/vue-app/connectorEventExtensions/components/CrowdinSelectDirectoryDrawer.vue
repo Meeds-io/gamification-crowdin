@@ -27,8 +27,10 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
       <v-treeview
         v-model="selected"
         :items="treeDirectories"
+        item-key="path"
         selection-type="all"
-        selectable />
+        selectable
+        return-object />
     </template>
     <template #footer>
       <div class="d-flex">
@@ -68,7 +70,7 @@ export default {
   },
   computed: {
     treeDirectories() {
-      return this.buildTree(this.directories);
+      return this.$crowdinUtils.buildTree(this.directories);
     },
     disableApply() {
       return this.selectedDirectories.toString() === this.selected.toString();
@@ -79,7 +81,7 @@ export default {
   },
   methods: {
     open() {
-      this.selected = this.selectedDirectories;
+      this.selected = this.directories.filter(dir => this.selectedDirectories.includes(dir.id));
       if (this.$refs.directorySelectionDrawer) {
         this.$refs.directorySelectionDrawer.open();
       }
@@ -89,29 +91,8 @@ export default {
         this.$refs.directorySelectionDrawer.close();
       }
     },
-    buildTree() {
-      const tree = [];
-      const lookup = {};
-      this.directories?.forEach((dir) => {
-        const parts = dir.path.split('/').filter(Boolean);
-        let currentLevel = tree;
-        parts.forEach((part) => {
-          if (!lookup[part]) {
-            const node = {
-              id: dir.id,
-              name: part,
-              children: [],
-            };
-            lookup[part] = node;
-            currentLevel.push(node);
-          }
-          currentLevel = lookup[part].children;
-        });
-      });
-      return tree;
-    },
     apply() {
-      this.$emit('apply', this.selected);
+      this.$emit('apply', this.selected?.map(repo => repo.id));
       this.close();
     }
   }
