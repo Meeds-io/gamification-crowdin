@@ -22,3 +22,10 @@ if (!Vue.prototype.$crowdinConnectorService) {
     value: crowdinConnectorService,
   });
 }
+
+import * as crowdinUtils from './js/CrowdinUtils.js';
+if (!Vue.prototype.$crowdinUtils) {
+  window.Object.defineProperty(Vue.prototype, '$crowdinUtils', {
+    value: crowdinUtils,
+  });
+}

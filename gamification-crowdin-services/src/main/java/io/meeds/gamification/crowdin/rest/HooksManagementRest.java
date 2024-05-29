@@ -64,27 +64,22 @@ public class HooksManagementRest {
   private CrowdinConsumerStorage crowdinConsumerStorage;
 
   @GetMapping
-  @Secured("rewarding")
+  @Secured("users")
   @Operation(summary = "Retrieves the list Crowdin webHooks", method = "GET")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
                           @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public WebHookList getWebHooks(HttpServletRequest request,
-                                 @Parameter(description = "Offset") @RequestParam("offset") int offset,
+  public WebHookList getWebHooks(@Parameter(description = "Offset") @RequestParam("offset") int offset,
                                  @Parameter(description = "Query results limit", required = true) @RequestParam("limit") int limit,
                                  @Parameter(description = "force update remote project info") @RequestParam(value = "forceUpdate", defaultValue = "false", required = false) boolean forceUpdate,
                                  @Parameter(description = "Include languages") @Schema(defaultValue = "false") @RequestParam("includeLanguages") boolean includeLanguages) {
 
     List<WebHookRestEntity> webHookRestEntities;
-    try {
-      WebHookList webHookList = new WebHookList();
-      webHookRestEntities = getWebHookRestEntities(request.getRemoteUser(), includeLanguages, forceUpdate);
-      webHookList.setWebhooks(webHookRestEntities);
-      webHookList.setOffset(offset);
-      webHookList.setLimit(limit);
-      return webHookList;
-    } catch (IllegalAccessException e) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-    }
+    WebHookList webHookList = new WebHookList();
+    webHookRestEntities = getWebHookRestEntities(includeLanguages, forceUpdate);
+    webHookList.setWebhooks(webHookRestEntities);
+    webHookList.setOffset(offset);
+    webHookList.setLimit(limit);
+    return webHookList;
   }
 
   @GetMapping("{webHookId}")
@@ -121,13 +116,9 @@ public class HooksManagementRest {
   @ApiResponse(responseCode = "503", description = "Service unavailable")
   public List<RemoteDirectory> getProjectDirectories(HttpServletRequest request,
                                                      @Parameter(description = "Remote project identifier", required = true) @PathVariable("projectId") long projectId,
-                                                     @Parameter(description = "Used to filter directory by ids") @RequestParam(value = "directoryId", required = false) List<Long> directoryIds,
                                                      @Parameter(description = "Query Offset") @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
                                                      @Parameter(description = "Query results limit") @RequestParam(value = "limit", required = false, defaultValue = "0") int limit) {
     try {
-      if (CollectionUtils.isNotEmpty(directoryIds)) {
-        return webhookService.getProjectDirectoriesByIds(projectId, directoryIds);
-      }
       return webhookService.getProjectDirectories(projectId, request.getRemoteUser(), offset, limit);
     } catch (IllegalArgumentException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -244,10 +235,9 @@ public class HooksManagementRest {
     }
   }
 
-  private List<WebHookRestEntity> getWebHookRestEntities(String username,
-                                                         boolean includeLanguages,
-                                                         boolean forceUpdate) throws IllegalAccessException {
-    Collection<WebHook> webHooks = webhookService.getWebhooks(username, 0, 20, forceUpdate);
+  private List<WebHookRestEntity> getWebHookRestEntities(boolean includeLanguages,
+                                                         boolean forceUpdate) {
+    Collection<WebHook> webHooks = webhookService.getWebhooks(0, 20, forceUpdate);
     return WebHookBuilder.toRestEntities(crowdinConsumerStorage, webHooks, includeLanguages);
   }
 
