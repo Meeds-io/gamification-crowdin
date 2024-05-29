@@ -322,29 +322,6 @@ public class CrowdinConsumerStorage {
     }
   }
 
-  public RemoteDirectory getProjectDirectoryById(long remoteProjectId,
-                                                 long remoteDirectoryId,
-                                                 String accessToken) throws IllegalAccessException {
-    try {
-      URI uri = URI.create(CROWDIN_API_URL + PROJECTS + remoteProjectId + "/directories/" + remoteDirectoryId);
-      String response = processGet(uri, accessToken);
-
-      JSONObject responseJson = new JSONObject(response);
-
-      JSONObject dataJson = responseJson.getJSONObject("data");
-      // parse the directory
-      RemoteDirectory directory = new RemoteDirectory();
-      directory.setId(dataJson.getInt("id"));
-      directory.setProjectId(dataJson.getLong("projectId"));
-      directory.setPath(dataJson.getString("path"));
-      return directory;
-    } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException(e);
-    } catch (CrowdinConnectionException e) {
-      throw new IllegalAccessException(TOKEN_EXPIRED_OR_INVALID);
-    }
-  }
-
   public void clearCache() {
     // implemented in cached storage
   }

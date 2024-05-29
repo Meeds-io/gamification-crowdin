@@ -18,8 +18,8 @@
 -->
 <template>
   <v-list-item
-    class="clickable mb-2"
     :href="projectUrl"
+    class="clickable mb-2"
     target="_blank">
     <v-list-item-icon class="me-3 my-auto">
       <v-avatar

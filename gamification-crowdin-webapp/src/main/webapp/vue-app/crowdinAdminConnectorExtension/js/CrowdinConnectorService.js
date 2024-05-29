@@ -58,20 +58,8 @@ export function getCrowdinWebHookById(hookId) {
   });
 }
 
-export function getWebHookDirectories(projectId, directoryIds, offset, limit) {
-  const formData = new FormData();
-
-  if (directoryIds?.length) {
-    directoryIds.forEach(id => formData.append('directoryId', id));
-  }
-  if (offset) {
-    formData.append('offset', offset);
-  }
-  if (limit) {
-    formData.append('limit', limit);
-  }
-  const params = new URLSearchParams(formData).toString();
-  return fetch(`/gamification-crowdin/rest/crowdin/hooks/${projectId}/directories?${params}`, {
+export function getWebHookDirectories(projectId, offset, limit) {
+  return fetch(`/gamification-crowdin/rest/crowdin/hooks/${projectId}/directories?offset=${offset || 0}&limit=${limit|| 25}`, {
     method: 'GET',
     credentials: 'include',
   }).then((resp) => {

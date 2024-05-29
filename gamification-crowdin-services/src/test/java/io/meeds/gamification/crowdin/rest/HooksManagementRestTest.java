@@ -98,12 +98,6 @@ class HooksManagementRestTest {
   void getWebhooksSimpleUser() throws Exception {
     ResultActions response =
                            mockMvc.perform(get(HOOKS_PATH + "?offset=0&limit=10&includeLanguages=false").with(testSimpleUser()));
-    response.andExpect(status().isForbidden());
-  }
-
-  @Test
-  void getWebhooksAdmin() throws Exception {
-    ResultActions response = mockMvc.perform(get(HOOKS_PATH + "?offset=0&limit=10&includeLanguages=false").with(testAdminUser()));
     response.andExpect(status().isOk());
   }
 
@@ -140,14 +134,6 @@ class HooksManagementRestTest {
                                                                                .param("limit", "10")
                                                                                .with(testSimpleUser()));
     verify(webhookService, times(1)).getProjectDirectories(4L, SIMPLE_USER, 0, 10);
-    response.andExpect(status().isOk());
-
-    response = mockMvc.perform(get(HOOKS_PATH + "/4/directories").param("offset", "0")
-            .param("limit", "10")
-            .param("directoryId", "124")
-            .param("directoryId", "155")
-            .with(testSimpleUser()));
-    verify(webhookService, times(1)).getProjectDirectoriesByIds(4L, List.of(124L, 155L));
     response.andExpect(status().isOk());
   }
 

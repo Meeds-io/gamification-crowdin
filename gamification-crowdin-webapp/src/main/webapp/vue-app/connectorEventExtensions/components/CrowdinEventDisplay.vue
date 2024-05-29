@@ -113,9 +113,9 @@ export default {
           this.project = data.webhooks.find(a => a.projectId === Number(this.projectId));
         }).then(() => {
           if (this.directoryIds) {
-            return this.$crowdinConnectorService.getWebHookDirectories(this.projectId, this.directoryIds)
+            return this.$crowdinConnectorService.getWebHookDirectories(this.projectId, 0, 500)
               .then(data => {
-                this.directories = data;
+                this.directories = this.$crowdinUtils.processItems(data, this.directoryIds);
               });
           }
         })
