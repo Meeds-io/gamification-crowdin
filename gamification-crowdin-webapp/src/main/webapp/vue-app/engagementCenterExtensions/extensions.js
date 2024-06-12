@@ -36,7 +36,9 @@ export function init() {
           return null;
         }
       },
-      isExtensible: true
+      isExtensible: true,
+      targetItemLabel: 'words',
+      defaultTotalTargetItem: 100
     },
   });
 }

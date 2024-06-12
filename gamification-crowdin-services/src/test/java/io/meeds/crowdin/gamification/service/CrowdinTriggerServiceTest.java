@@ -66,16 +66,17 @@ class CrowdinTriggerServiceTest {
   private CrowdinTriggerService  crowdinTriggerService;
 
   @Test
-  void testProcessEvents() throws Exception {
-    Event event = new Event("stringComment.created", USER, USER, "1", "objectType", "123", "1", true, "1", false);
-    Event event1 = new Event("stringComment.deleted", USER, USER, "1", "objectType", "123", "1", true, "1", false);
+  void testProcessEvents() {
+    Event event = new Event("stringComment.created", USER, USER, "1", "objectType", "123", "1", true, "1", false, 3);
+    Event event1 = new Event("stringComment.deleted", USER, USER, "1", "objectType", "123", "1", true, "1", false, 4);
 
     when(triggerService.isTriggerEnabledForAccount("stringComment.created", 123L)).thenReturn(true);
     when(triggerService.isTriggerEnabledForAccount("stringComment.deleted", 123L)).thenReturn(false);
     when(connectorService.getAssociatedUsername(CONNECTOR_NAME, USER)).thenReturn("1");
 
     String eventDetails = "{" + PROJECT_ID + ": " + event.getProjectId() + ", " + LANGUAGE_ID + ": " + event.getLanguageId()
-        + ", " + MUST_BE_HUMAN + ": " + event.isMustBeHuman() + ", " + DIRECTORY_ID + ": " + event.getDirectoryId() + "}";
+        + ", " + MUST_BE_HUMAN + ": " + event.isMustBeHuman() + ", " + DIRECTORY_ID + ": " + event.getDirectoryId() + ", "
+        + TOTAL_TARGET_ITEM + ": " + event.getTotalWords() + "}";
 
     crowdinTriggerService.processEvents(List.of(event1, event), "123");
     Map<String, String> gam = new HashMap<>();
