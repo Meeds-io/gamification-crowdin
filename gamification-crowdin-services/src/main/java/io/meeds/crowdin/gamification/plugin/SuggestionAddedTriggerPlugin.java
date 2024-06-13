@@ -61,7 +61,8 @@ public class SuggestionAddedTriggerPlugin extends CrowdinTriggerPlugin {
                                                  extractSubItem(payload, TRANSLATION, TARGET_LANGUAGE, ID),
                                                  extractSubItem(payload, TRANSLATION, PROVIDER) == null,
                                                  extractSubItem(payload, TRANSLATION, STRING, FILE, DIRECTORY_ID),
-                                                 false));
+                                                 false,
+                                                 countWords(extractSubItem(payload, TRANSLATION, TEXT))));
     } else if (trigger.equals(SUGGESTION_DELETED_TRIGGER)) {
       List<RealizationDTO> realizations = realizationService.findRealizationsByObjectIdAndObjectType(objectId, TRANSLATION);
       if (CollectionUtils.isEmpty(realizations)) {
@@ -77,7 +78,8 @@ public class SuggestionAddedTriggerPlugin extends CrowdinTriggerPlugin {
                                                  extractSubItem(payload, TRANSLATION, TARGET_LANGUAGE, ID),
                                                  extractSubItem(payload, TRANSLATION, PROVIDER) == null,
                                                  extractSubItem(payload, TRANSLATION, STRING, FILE, DIRECTORY_ID),
-                                                 true));
+                                                 true,
+                                                 countWords(extractSubItem(payload, TRANSLATION, TEXT))));
     } else {
       return Collections.emptyList();
     }

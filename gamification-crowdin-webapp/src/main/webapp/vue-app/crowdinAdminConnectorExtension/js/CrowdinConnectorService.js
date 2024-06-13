@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 export function getProjects(accessToken, hookId) {
-  return fetch(`/gamification-crowdin/rest/crowdin/hooks/projects?accessToken=${accessToken || ''}&hookId=${hookId || ''}`  , {
+  return fetch(`/gamification-crowdin/rest/hooks/projects?accessToken=${accessToken || ''}&hookId=${hookId || ''}`  , {
     method: 'GET',
     credentials: 'include',
   }).then((resp) => {
@@ -33,7 +33,7 @@ export function getProjects(accessToken, hookId) {
 }
 
 export function getCrowdinWebHooks(offset, limit, includeLanguages, forceUpdate) {
-  return fetch(`/gamification-crowdin/rest/crowdin/hooks?offset=${offset || 0}&limit=${limit|| 10}&includeLanguages=${includeLanguages|| false}&forceUpdate=${forceUpdate|| false}`, {
+  return fetch(`/gamification-crowdin/rest/hooks?offset=${offset || 0}&limit=${limit|| 10}&includeLanguages=${includeLanguages|| false}&forceUpdate=${forceUpdate|| false}`, {
     method: 'GET',
     credentials: 'include',
   }).then((resp) => {
@@ -46,7 +46,7 @@ export function getCrowdinWebHooks(offset, limit, includeLanguages, forceUpdate)
 }
 
 export function getCrowdinWebHookById(hookId) {
-  return fetch(`/gamification-crowdin/rest/crowdin/hooks/${hookId}`, {
+  return fetch(`/gamification-crowdin/rest/hooks/${hookId}`, {
     method: 'GET',
     credentials: 'include',
   }).then((resp) => {
@@ -59,7 +59,7 @@ export function getCrowdinWebHookById(hookId) {
 }
 
 export function getWebHookDirectories(projectId, offset, limit) {
-  return fetch(`/gamification-crowdin/rest/crowdin/hooks/${projectId}/directories?offset=${offset || 0}&limit=${limit|| 25}`, {
+  return fetch(`/gamification-crowdin/rest/hooks/${projectId}/directories?offset=${offset || 0}&limit=${limit|| 25}`, {
     method: 'GET',
     credentials: 'include',
   }).then((resp) => {
@@ -77,7 +77,7 @@ export function saveCrowdinWebHook(project, accessToken) {
   formData.append('projectName', project.name);
   formData.append('projectLogo', project.logo);
   formData.append('accessToken', accessToken);
-  return fetch('/gamification-crowdin/rest/crowdin/hooks', {
+  return fetch('/gamification-crowdin/rest/hooks', {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -101,7 +101,7 @@ export function updateWebHookAccessToken(webHookId, accessToken) {
   const formData = new FormData();
   formData.append('webHookId', webHookId);
   formData.append('accessToken', accessToken);
-  return fetch('/gamification-crowdin/rest/crowdin/hooks', {
+  return fetch('/gamification-crowdin/rest/hooks', {
     method: 'PATCH',
     credentials: 'include',
     headers: {
@@ -118,7 +118,7 @@ export function updateWebHookAccessToken(webHookId, accessToken) {
 }
 
 export function deleteCrowdinWebHook(projectId) {
-  return fetch(`/gamification-crowdin/rest/crowdin/hooks/${projectId}`, {
+  return fetch(`/gamification-crowdin/rest/hooks/${projectId}`, {
     method: 'DELETE',
     credentials: 'include',
   }).then(resp => {

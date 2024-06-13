@@ -60,7 +60,8 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
                             extractSubItem(payload, TRANSLATION, TARGET_LANGUAGE, ID),
                             extractSubItem(payload, TRANSLATION, PROVIDER) == null,
                             extractSubItem(payload, TRANSLATION, STRING, FILE, DIRECTORY_ID),
-                            trigger.equals(SUGGESTION_DISAPPROVED_TRIGGER)));
+                            trigger.equals(SUGGESTION_DISAPPROVED_TRIGGER),
+                            countWords(extractSubItem(payload, TRANSLATION, TEXT))));
 
     List<RealizationDTO> realizations = realizationService.findRealizationsByObjectIdAndObjectType(objectId, TRANSLATION);
 
@@ -75,7 +76,8 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
                               extractSubItem(payload, TRANSLATION, TARGET_LANGUAGE, ID),
                               extractSubItem(payload, TRANSLATION, PROVIDER) == null,
                               extractSubItem(payload, TRANSLATION, STRING, FILE, DIRECTORY_ID),
-                              trigger.equals(SUGGESTION_DISAPPROVED_TRIGGER)));
+                              trigger.equals(SUGGESTION_DISAPPROVED_TRIGGER),
+                              countWords(extractSubItem(payload, TRANSLATION, TEXT))));
 
     }
 

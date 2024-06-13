@@ -142,7 +142,8 @@ public class CrowdinTriggerService {
   private void broadcastCrowdinEvent(Event event, String senderId, String receiverId) {
     try {
       String eventDetails = "{" + PROJECT_ID + ": " + event.getProjectId() + ", " + LANGUAGE_ID + ": " + event.getLanguageId()
-          + ", " + MUST_BE_HUMAN + ": " + event.isMustBeHuman() + ", " + DIRECTORY_ID + ": " + event.getDirectoryId() + "}";
+          + ", " + MUST_BE_HUMAN + ": " + event.isMustBeHuman() + ", " + DIRECTORY_ID + ": " + event.getDirectoryId() + ", "
+          + TOTAL_TARGET_ITEM + ": " + event.getTotalWords() + "}";
       Map<String, String> gam = new HashMap<>();
       gam.put("senderId", senderId);
       gam.put("receiverId", receiverId);

@@ -18,14 +18,13 @@
  */
 package io.meeds.crowdin.gamification.rest;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.exoplatform.commons.ObjectAlreadyExistsException;
+import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,15 +44,12 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import io.meeds.crowdin.gamification.rest.HooksManagementRest;
 import io.meeds.crowdin.gamification.services.WebhookService;
 import io.meeds.crowdin.gamification.storage.CrowdinConsumerStorage;
 import io.meeds.spring.web.security.PortalAuthenticationManager;
 import io.meeds.spring.web.security.WebSecurityConfiguration;
 
 import jakarta.servlet.Filter;
-
-import java.util.List;
 
 @SpringBootTest(classes = { HooksManagementRest.class, PortalAuthenticationManager.class, })
 @ContextConfiguration(classes = { WebSecurityConfiguration.class })
@@ -62,7 +58,7 @@ import java.util.List;
 @ExtendWith(MockitoExtension.class)
 class HooksManagementRestTest {
 
-  private static final String    HOOKS_PATH    = "/crowdin/hooks"; // NOSONAR
+  private static final String    HOOKS_PATH    = "/hooks"; // NOSONAR
 
   private static final String    SIMPLE_USER   = "simple";
 
@@ -121,6 +117,21 @@ class HooksManagementRestTest {
 
     response = mockMvc.perform(get(HOOKS_PATH + "/1").with(testAdminUser()));
     response.andExpect(status().isOk());
+
+    doThrow(new IllegalAccessException()).when(webhookService).getWebhookId(1, ADMIN_USER);
+
+    response = mockMvc.perform(get(HOOKS_PATH + "/1").with(testAdminUser()));
+    response.andExpect(status().isUnauthorized());
+
+    doThrow(new IllegalArgumentException()).when(webhookService).getWebhookId(1, ADMIN_USER);
+
+    response = mockMvc.perform(get(HOOKS_PATH + "/1").with(testAdminUser()));
+    response.andExpect(status().isBadRequest());
+
+    doThrow(new ObjectNotFoundException("Webhook doesn't exist")).when(webhookService).getWebhookId(1, ADMIN_USER);
+
+    response = mockMvc.perform(get(HOOKS_PATH + "/1").with(testAdminUser()));
+    response.andExpect(status().isNotFound());
   }
 
   @Test
@@ -136,6 +147,28 @@ class HooksManagementRestTest {
                                                                                .with(testSimpleUser()));
     verify(webhookService, times(1)).getProjectDirectories(4L, SIMPLE_USER, 0, 10);
     response.andExpect(status().isOk());
+
+    doThrow(new IllegalAccessException()).when(webhookService).getProjectDirectories(4L, SIMPLE_USER, 0, 10);
+
+    response =
+             mockMvc.perform(get(HOOKS_PATH + "/4/directories").param("offset", "0").param("limit", "10").with(testSimpleUser()));
+    response.andExpect(status().isUnauthorized());
+
+    doThrow(new IllegalArgumentException()).when(webhookService).getProjectDirectories(4L, SIMPLE_USER, 0, 10);
+
+    response =
+             mockMvc.perform(get(HOOKS_PATH + "/4/directories").param("offset", "0").param("limit", "10").with(testSimpleUser()));
+    response.andExpect(status().isBadRequest());
+
+    doThrow(new ObjectNotFoundException("Webhook with project id '4' doesn't exist")).when(webhookService)
+                                                                                     .getProjectDirectories(4L,
+                                                                                                            SIMPLE_USER,
+                                                                                                            0,
+                                                                                                            10);
+
+    response =
+             mockMvc.perform(get(HOOKS_PATH + "/4/directories").param("offset", "0").param("limit", "10").with(testSimpleUser()));
+    response.andExpect(status().isNotFound());
   }
 
   @Test
@@ -158,6 +191,7 @@ class HooksManagementRestTest {
     ResultActions response = mockMvc.perform(get(HOOKS_PATH + "/projects").param("accessToken", "accessToken")
                                                                           .param("hookId", "1232")
                                                                           .with(testAdminUser()));
+    verify(webhookService, times(1)).getProjectsFromWebhookId(1232);
     response.andExpect(status().isOk());
   }
 
@@ -184,34 +218,38 @@ class HooksManagementRestTest {
 
   @Test
   void createWebhookAdmin() throws Exception {
-    ResultActions response = mockMvc.perform(post(HOOKS_PATH).param("projectName", "projectName")
+
+    ResultActions response = mockMvc.perform(post(HOOKS_PATH).param("projectId", "1")
+                                                             .param("projectName", "projectName")
                                                              .param("accessToken", "accessToken")
                                                              .with(testAdminUser())
                                                              .contentType(MediaType.APPLICATION_JSON)
                                                              .accept(MediaType.APPLICATION_JSON));
-    response.andExpect(status().isBadRequest());
-
-    response = mockMvc.perform(post(HOOKS_PATH).param("projectId", "1")
-                                               .param("accessToken", "accessToken")
-                                               .with(testAdminUser())
-                                               .contentType(MediaType.APPLICATION_JSON)
-                                               .accept(MediaType.APPLICATION_JSON));
-    response.andExpect(status().isBadRequest());
-
-    response = mockMvc.perform(post(HOOKS_PATH).param("projectId", "1")
-                                               .param("projectName", "projectName")
-                                               .with(testAdminUser())
-                                               .contentType(MediaType.APPLICATION_JSON)
-                                               .accept(MediaType.APPLICATION_JSON));
-    response.andExpect(status().isBadRequest());
-
-    response = mockMvc.perform(post(HOOKS_PATH).param("projectId", "1")
-                                               .param("projectName", "projectName")
-                                               .param("accessToken", "accessToken")
-                                               .with(testAdminUser())
-                                               .contentType(MediaType.APPLICATION_JSON)
-                                               .accept(MediaType.APPLICATION_JSON));
     response.andExpect(status().isCreated());
+
+    doThrow(new IllegalAccessException()).when(webhookService).createWebhook(1, "projectName", "accessToken", ADMIN_USER);
+
+    response = mockMvc.perform(post(HOOKS_PATH).param("projectId", "1")
+                                               .param("projectName", "projectName")
+                                               .param("accessToken", "accessToken")
+                                               .with(testAdminUser())
+                                               .contentType(MediaType.APPLICATION_JSON)
+                                               .accept(MediaType.APPLICATION_JSON));
+
+    response.andExpect(status().isUnauthorized());
+
+    doThrow(new ObjectAlreadyExistsException(null)).when(webhookService)
+                                                   .createWebhook(1, "projectName", "accessToken", ADMIN_USER);
+
+    response = mockMvc.perform(post(HOOKS_PATH).param("projectId", "1")
+                                               .param("projectName", "projectName")
+                                               .param("accessToken", "accessToken")
+                                               .with(testAdminUser())
+                                               .contentType(MediaType.APPLICATION_JSON)
+                                               .accept(MediaType.APPLICATION_JSON));
+
+    response.andExpect(status().isConflict());
+
   }
 
   @Test

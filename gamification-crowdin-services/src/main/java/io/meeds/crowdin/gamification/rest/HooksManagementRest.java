@@ -34,8 +34,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.ObjectAlreadyExistsException;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,10 +47,8 @@ import javax.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.List;
 
-import static io.meeds.gamification.utils.Utils.getCurrentUser;
-
 @RestController
-@RequestMapping("crowdin/hooks")
+@RequestMapping("hooks")
 @Tag(name = "hooks", description = "An endpoint to manage crowdin webhooks")
 public class HooksManagementRest {
 
@@ -91,13 +87,15 @@ public class HooksManagementRest {
   @ApiResponse(responseCode = "400", description = "Bad request")
   @ApiResponse(responseCode = "401", description = "Unauthorized")
   @ApiResponse(responseCode = "503", description = "Service unavailable")
-  public WebHook getWebHookById(@Parameter(description = "WebHook technical identifier", required = true) @PathVariable("webHookId") long webHookId) {
+  public WebHook getWebHookById(HttpServletRequest request,
+                                @Parameter(description = "WebHook technical identifier", required = true)
+                                @PathVariable("webHookId")
+                                long webHookId) {
     if (webHookId == 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "WebHook Id must be not null");
     }
-    String currentUser = getCurrentUser();
     try {
-      return webhookService.getWebhookId(webHookId, currentUser);
+      return webhookService.getWebhookId(webHookId, request.getRemoteUser());
     } catch (IllegalArgumentException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (IllegalAccessException e) {
@@ -168,13 +166,6 @@ public class HooksManagementRest {
                                                   @Parameter(description = "Crowdin project id", required = true) @RequestParam("projectId") Long projectId,
                                                   @Parameter(description = "Crowdin project name", required = true) @RequestParam("projectName") String projectName,
                                                   @Parameter(description = "Crowdin personal access token", required = true) @RequestParam("accessToken") String accessToken) {
-
-    if (projectId == null || StringUtils.isBlank(projectName)) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'projectId' and 'projectName' parameter are mandatory");
-    }
-    if (StringUtils.isBlank(accessToken)) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'accessToken' parameter is mandatory");
-    }
     try {
       webhookService.createWebhook(projectId, projectName, accessToken, request.getRemoteUser());
       return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -200,9 +191,6 @@ public class HooksManagementRest {
 
     if (webHookId <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'webHookId' must be positive");
-    }
-    if (StringUtils.isBlank(accessToken)) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'accessToken' parameter is mandatory");
     }
     try {
       webhookService.updateWebHookAccessToken(webHookId, accessToken, request.getRemoteUser());

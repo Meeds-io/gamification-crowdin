@@ -46,4 +46,6 @@ public class Event {
   String  directoryId;
 
   boolean isCancelling;
+
+  int totalWords;
 }
