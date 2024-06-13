@@ -57,12 +57,16 @@ public class Utils {
   public static final String   LANGUAGE_ID                        = "languageId";
 
   public static final String   MUST_BE_HUMAN                      = "mustBeHuman";
+  
+  public static final String   TOTAL_TARGET_ITEM                  = "totalTargetItem";
 
   public static final String   STRING                             = "string";
 
   public static final String   TARGET_LANGUAGE                    = "targetLanguage";
 
   public static final String   PROJECT                            = "project";
+  
+  public static final String   TEXT                               = "text";
 
   public static final String   ID                                 = "id";
 
@@ -177,5 +181,13 @@ public class Utils {
     String targetLanguageId = extractSubItem(payload, payloadObjectName, TARGET_LANGUAGE, ID);
     return "{\"id\":" + id + ",\"stringUrl\":\"https://crowdin.com/editor/" + projectSlug + "/" + fileId + "/" + sourceLanguageId
         + "-" + targetLanguageId + "?view=comfortable#" + stringId + "\"}";
+  }
+
+  public static int countWords(String text) {
+    if (text == null || text.isEmpty()) {
+      return 0;
+    }
+    String[] words = text.split("\\s+");
+    return words.length;
   }
 }

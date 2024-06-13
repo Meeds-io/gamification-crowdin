@@ -53,7 +53,8 @@ public class StringCommentCreatedTriggerPlugin extends CrowdinTriggerPlugin {
                                                extractSubItem(payload, COMMENT, TARGET_LANGUAGE, ID),
                                                true,
                                                extractSubItem(payload, COMMENT, STRING, FILE, DIRECTORY_ID),
-                                               trigger.equals(COMMENT_DELETED_TRIGGER)));
+                                               trigger.equals(COMMENT_DELETED_TRIGGER),
+                                               countWords(extractSubItem(payload, TRANSLATION, TEXT))));
   }
 
   @Override
