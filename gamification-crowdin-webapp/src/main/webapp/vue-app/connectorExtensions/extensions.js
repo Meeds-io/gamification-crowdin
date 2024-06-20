@@ -22,6 +22,7 @@ export function init() {
     image: '/gamification-crowdin/images/crowdin.png',
     title: 'Crowdin',
     description: 'crowdinConnector.admin.label.description',
+    actionLabel: 'crowdinConnector.action.form.label',
     rank: 40,
     init: () => {
       const lang = window.eXo?.env?.portal?.language || 'en';
