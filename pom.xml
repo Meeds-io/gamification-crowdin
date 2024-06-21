@@ -73,7 +73,7 @@
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>io.meeds.addons.gamification</groupId>
+        <groupId>io.meeds.gamification</groupId>
         <artifactId>gamification</artifactId>
         <version>${addon.meeds.gamification.version}</version>
         <type>pom</type>

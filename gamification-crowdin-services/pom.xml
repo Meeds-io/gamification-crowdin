@@ -44,7 +44,7 @@
       <artifactId>social-component-oauth-auth</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.meeds.addons.gamification</groupId>
+      <groupId>io.meeds.gamification</groupId>
       <artifactId>gamification-services</artifactId>
     </dependency>
   </dependencies>
