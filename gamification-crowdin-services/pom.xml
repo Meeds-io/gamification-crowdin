@@ -36,15 +36,15 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.exoplatform.social</groupId>
+      <groupId>io.meeds.social</groupId>
       <artifactId>social-component-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.social</groupId>
+      <groupId>io.meeds.social</groupId>
       <artifactId>social-component-oauth-auth</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.addons.gamification</groupId>
+      <groupId>io.meeds.addons.gamification</groupId>
       <artifactId>gamification-services</artifactId>
     </dependency>
   </dependencies>
