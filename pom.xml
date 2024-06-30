@@ -47,9 +47,9 @@
     <tag>HEAD</tag>
   </scm>
   <properties>
-    <org.exoplatform.social.version>7.0.x-meed-SNAPSHOT</org.exoplatform.social.version>
-    <org.exoplatform.platform-ui.version>7.0.x-meed-SNAPSHOT</org.exoplatform.platform-ui.version>
-    <addon.exo.gamification.version>7.0.x-meed-SNAPSHOT</addon.exo.gamification.version>
+    <org.exoplatform.social.version>7.0.0-meed-20240630</org.exoplatform.social.version>
+    <org.exoplatform.platform-ui.version>7.0.0-meed-20240630</org.exoplatform.platform-ui.version>
+    <addon.exo.gamification.version>7.0.0-meed-20240630</addon.exo.gamification.version>
 
     <!-- Sonar properties -->
     <sonar.organization>meeds-io</sonar.organization>
