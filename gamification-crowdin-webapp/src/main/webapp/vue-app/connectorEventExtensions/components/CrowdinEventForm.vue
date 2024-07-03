@@ -270,17 +270,19 @@ export default {
       if (!this.anyDir) {
         this.$root.$emit('directory-selection-drawer-open');
       } else {
-        document.dispatchEvent(new CustomEvent('event-form-filled'));}
+        this.selectedDirectories = [];
+        this.readySelection();
+      }
     },
     selectDirectories(directories) {
       if (directories.length > 0) {
         this.selectedDirectories = directories;
         this.selectedDirectoriesToDisplay = this.$crowdinUtils.processItems(this.directories, this.selectedDirectories);
-        this.readySelection();
       } else {
         this.anyDir = true;
-        document.dispatchEvent(new CustomEvent('event-form-filled'));
+        this.selectedDirectories = [];
       }
+      this.readySelection();
     },
     changeLanguageSelection() {
       this.selectedLanguages = [];
