@@ -18,7 +18,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <div>
-    <v-card-text class="pa-0 pt-3">
+    <v-card-text class="px-0 pb-0 pt-3">
       {{ $t('gamification.crowdin.event.form.project') }}
     </v-card-text>
     <v-progress-circular
