@@ -26,7 +26,7 @@ export function init() {
     rank: 40,
     init: () => {
       const lang = window.eXo?.env?.portal?.language || 'en';
-      const url = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.CrowdinWebHookManagement-${lang}.json`;
+      const url = `/gamification-crowdin/i18n/locale.portlet.CrowdinWebHookManagement?lang=${lang}`;
       return exoi18n.loadLanguageAsync(lang, url);
     }
   });
