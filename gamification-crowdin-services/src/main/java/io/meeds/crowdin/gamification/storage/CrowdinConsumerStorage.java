@@ -56,9 +56,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class CrowdinConsumerStorage {
@@ -117,6 +115,49 @@ public class CrowdinConsumerStorage {
       JSONObject headers = new JSONObject();
       headers.put("Authorization", "Bearer " + secret);
       requestJson.put("headers", headers);
+
+      Map<String, Object> fileMap = new HashMap<>();
+      fileMap.put("id", "{{fileId}}");
+      fileMap.put("directoryId", "{{directoryId}}");
+
+      Map<String, Object> projectMap = new HashMap<>();
+      projectMap.put("id", "{{projectId}}");
+      projectMap.put("sourceLanguageId", "{{projectSourceLanguageId}}");
+      projectMap.put("identifier", "{{projectIdentifier}}");
+
+      Map<String, Object> stringMap = new HashMap<>();
+      stringMap.put("id", "{{stringId}}");
+      stringMap.put("text", "{{stringText}}");
+      stringMap.put("file", fileMap);
+      stringMap.put("project", projectMap);
+
+      Map<String, Object> userMap = new HashMap<>();
+      userMap.put("id", "{{userId}}");
+      userMap.put("username", "{{userUsername}}");
+      userMap.put("fullName", "{{userFullName}}");
+      userMap.put("avatarUrl", "{{userAvatarUrl}}");
+
+      Map<String, Object> languageMap = new HashMap<>();
+      languageMap.put("id", "{{targetLanguageId}}");
+
+      Map<String, Object> translationMap = new HashMap<>();
+      translationMap.put("id", "{{translationId}}");
+      translationMap.put("provider", "{{translationProvider}}");
+      translationMap.put("targetLanguage", languageMap);
+      translationMap.put("user", userMap);
+      translationMap.put("string", stringMap);
+
+      Map<String, Object> eventMap = new HashMap<>();
+      eventMap.put("event", "{{event}}");
+      eventMap.put("translation", translationMap);
+
+      Map<String, Object> payload = new HashMap<>();
+
+      Arrays.stream(CROWDIN_EVENTS)
+            .filter(event -> !List.of(COMMENT_CREATED_TRIGGER, COMMENT_DELETED_TRIGGER).contains(event))
+            .forEach(event -> payload.put(event, eventMap));
+
+      requestJson.put("payload", payload);
 
       String response = processPost(uri, requestJson.toString(), accessToken);
 
