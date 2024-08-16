@@ -147,15 +147,29 @@ public class CrowdinConsumerStorage {
       translationMap.put("user", userMap);
       translationMap.put("string", stringMap);
 
-      Map<String, Object> eventMap = new HashMap<>();
-      eventMap.put("event", "{{event}}");
-      eventMap.put("translation", translationMap);
+      Map<String, Object> commentMap = new HashMap<>();
+      commentMap.put("id", "{{commentId}}");
+      commentMap.put("targetLanguage", languageMap);
+      commentMap.put("user", userMap);
+      commentMap.put("string", stringMap);
+
+      Map<String, Object> translationEventMap = new HashMap<>();
+      translationEventMap.put("event", "{{event}}");
+      translationEventMap.put("translation", translationMap);
+
+      Map<String, Object> commentEventMap = new HashMap<>();
+      commentEventMap.put("event", "{{event}}");
+      commentEventMap.put("comment", commentMap);
 
       Map<String, Object> payload = new HashMap<>();
 
-      Arrays.stream(CROWDIN_EVENTS)
-            .filter(event -> !List.of(COMMENT_CREATED_TRIGGER, COMMENT_DELETED_TRIGGER).contains(event))
-            .forEach(event -> payload.put(event, eventMap));
+      Arrays.stream(CROWDIN_EVENTS).forEach(event -> {
+        if (List.of(COMMENT_CREATED_TRIGGER, COMMENT_DELETED_TRIGGER).contains(event)) {
+          payload.put(event, commentEventMap);
+        } else {
+          payload.put(event, translationEventMap);
+        }
+      });
 
       requestJson.put("payload", payload);
 
