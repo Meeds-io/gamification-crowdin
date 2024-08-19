@@ -34,10 +34,10 @@
           </v-list-item-title>
           <v-list-item-subtitle v-if="description" class="text-truncate-2 caption mt-1 text-color">{{ description }}</v-list-item-subtitle>
           <v-list-item-subtitle class="d-flex flex-row">
-            <span class="text-truncate caption d-content pt-2px text-color"> {{ watchedByLabel }} </span>
+            <span class="text-truncate caption d-content text-color"> {{ watchedByLabel }} </span>
             <exo-user-avatar
               :profile-id="watchedBy"
-              extra-class="ms-1"
+              extra-class="ms-1 align-self-center"
               fullname
               popover />
           </v-list-item-subtitle>
