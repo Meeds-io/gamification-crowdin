@@ -20,17 +20,18 @@
   Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>addons-parent-pom</artifactId>
     <groupId>io.meeds.addons</groupId>
     <version>18-M04</version>
-    <relativePath />
+    <relativePath/>
   </parent>
   <groupId>io.meeds.gamification-crowdin</groupId>
   <artifactId>gamification-crowdin-parent</artifactId>
-  <version>7.0.0-exo-20240910</version>
+  <version>7.0.x-exo-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Meeds - Gamification Crowdin - Parent POM</name>
   <description>Meeds Add-on for Crowdin gamification add-on connector</description>
@@ -43,12 +44,12 @@
     <connection>scm:git:git://github.com/meeds-io/gamification-crowdin.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/meeds-io/gamification-crowdin.git</developerConnection>
     <url>https://github.com/meeds-io/gamification-crowdin</url>
-    <tag>7.0.0-exo-20240910</tag>
+    <tag>HEAD</tag>
   </scm>
   <properties>
-    <io.meeds.social.version>7.0.0-exo-20240910</io.meeds.social.version>
-    <io.meeds.platform-ui.version>7.0.0-exo-20240910</io.meeds.platform-ui.version>
-    <addon.meeds.gamification.version>7.0.0-exo-20240910</addon.meeds.gamification.version>
+    <io.meeds.social.version>7.0.x-exo-SNAPSHOT</io.meeds.social.version>
+    <io.meeds.platform-ui.version>7.0.x-exo-SNAPSHOT</io.meeds.platform-ui.version>
+    <addon.meeds.gamification.version>7.0.x-exo-SNAPSHOT</addon.meeds.gamification.version>
 
     <!-- Sonar properties -->
     <sonar.organization>meeds-io</sonar.organization>
