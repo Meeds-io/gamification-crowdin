@@ -160,7 +160,7 @@ export default {
       displayHookDetail: false,
       selectedHook: null,
       webhooks: [],
-      crowdinConnectorLinkBasePath: '/portal/administration/home/recognition/connectors#crowdin',
+      crowdinConnectorLinkBasePath: '/portal/administration/home/gamification/connectors#crowdin',
     };
   },
   computed: {
