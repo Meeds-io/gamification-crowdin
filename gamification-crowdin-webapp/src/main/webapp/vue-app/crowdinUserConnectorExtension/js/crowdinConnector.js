@@ -24,7 +24,7 @@ export default {
   identifier: '',
   user: '',
   rank: 40,
-  PROFILE_BASER_URL: 'https://crowdin.com',
+  PROFILE_BASER_URL: 'https://crowdin.com/profile',
   init: () => {
     const lang = window.eXo?.env?.portal?.language || 'en';
     const url = `/gamification-crowdin/i18n/locale.portlet.CrowdinWebHookManagement?lang=${lang}`;
