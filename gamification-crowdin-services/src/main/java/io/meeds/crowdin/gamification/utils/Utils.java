@@ -18,7 +18,7 @@ public class Utils {
   public static final String   CONNECTOR_NAME                     = "crowdin";
 
   public static final String[] CROWDIN_EVENTS                     = new String[] { "stringComment.created",
-      "stringComment.deleted", "suggestion.added", "suggestion.deleted", "suggestion.approved", "suggestion.disapproved" };
+          "stringComment.deleted", "suggestion.added", "suggestion.deleted", "suggestion.approved", "suggestion.disapproved" };
 
   public static final String   PROJECT_ID                         = "projectId";
 
@@ -33,6 +33,8 @@ public class Utils {
   public static final String   PROJECTS                           = "/projects/";
 
   public static final String   WEBHOOKS                           = "/webhooks/";
+
+  public static final String   APPROVALS                          = "/approvals/";
 
   public static final String   AUTHORIZED_TO_ACCESS_CROWDIN_HOOKS = "The user is not authorized to access crowdin Hooks";
 
@@ -57,7 +59,7 @@ public class Utils {
   public static final String   LANGUAGE_ID                        = "languageId";
 
   public static final String   MUST_BE_HUMAN                      = "mustBeHuman";
-  
+
   public static final String   TOTAL_TARGET_ITEM                  = "totalTargetItem";
 
   public static final String   STRING                             = "string";
@@ -65,7 +67,7 @@ public class Utils {
   public static final String   TARGET_LANGUAGE                    = "targetLanguage";
 
   public static final String   PROJECT                            = "project";
-  
+
   public static final String   TEXT                               = "text";
 
   public static final String   ID                                 = "id";
@@ -180,7 +182,7 @@ public class Utils {
     String sourceLanguageId = extractSubItem(payload, payloadObjectName, STRING, PROJECT, SOURCE_LANGUAGE_ID);
     String targetLanguageId = extractSubItem(payload, payloadObjectName, TARGET_LANGUAGE, ID);
     return "{\"id\":" + id + ",\"stringUrl\":\"https://crowdin.com/editor/" + projectSlug + "/" + fileId + "/" + sourceLanguageId
-        + "-" + targetLanguageId + "?view=comfortable#" + stringId + "\"}";
+            + "-" + targetLanguageId + "?view=comfortable#" + stringId + "\"}";
   }
 
   public static int countWords(String text) {

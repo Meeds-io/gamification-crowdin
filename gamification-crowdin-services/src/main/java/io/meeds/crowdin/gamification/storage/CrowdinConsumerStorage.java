@@ -18,6 +18,7 @@
  */
 package io.meeds.crowdin.gamification.storage;
 
+import io.meeds.crowdin.gamification.model.*;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,10 +40,6 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
 import io.meeds.crowdin.gamification.exception.CrowdinConnectionException;
-import io.meeds.crowdin.gamification.model.RemoteDirectory;
-import io.meeds.crowdin.gamification.model.RemoteLanguage;
-import io.meeds.crowdin.gamification.model.RemoteProject;
-import io.meeds.crowdin.gamification.model.WebHook;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -235,7 +232,7 @@ public class CrowdinConsumerStorage {
   private String processRequest(HttpClient httpClient, HttpRequestBase request) throws IOException, CrowdinConnectionException {
     HttpResponse response = httpClient.execute(request);
     boolean isSuccess = response != null
-        && (response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() < 300);
+            && (response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() < 300);
     if (isSuccess) {
       return processSuccessResponse(response);
     } else if (response != null && response.getStatusLine().getStatusCode() == 404) {
@@ -250,8 +247,8 @@ public class CrowdinConsumerStorage {
     if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) {
       return String.valueOf(HttpStatus.SC_NO_CONTENT);
     } else if ((response.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED
-        || response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) && response.getEntity() != null
-        && response.getEntity().getContentLength() != 0) {
+            || response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) && response.getEntity() != null
+            && response.getEntity().getContentLength() != 0) {
       try (InputStream is = response.getEntity().getContent()) {
         return IOUtils.toString(is, StandardCharsets.UTF_8);
       }
@@ -281,8 +278,8 @@ public class CrowdinConsumerStorage {
     if (client == null) {
       HttpClientConnectionManager clientConnectionManager = getClientConnectionManager();
       HttpClientBuilder httpClientBuilder = HttpClients.custom()
-                                                       .setConnectionManager(clientConnectionManager)
-                                                       .setConnectionReuseStrategy(new DefaultConnectionReuseStrategy());
+              .setConnectionManager(clientConnectionManager)
+              .setConnectionReuseStrategy(new DefaultConnectionReuseStrategy());
       client = httpClientBuilder.build();
     }
     return client;
@@ -379,6 +376,33 @@ public class CrowdinConsumerStorage {
       throw new IllegalAccessException(TOKEN_EXPIRED_OR_INVALID);
     }
   }
+
+  public RemoteApproval getApproval(String accessToken, String projectId, String translationId) {
+    try {
+      URI uri = URI.create(CROWDIN_API_URL + PROJECTS + projectId + APPROVALS + translationId);
+
+      String response = processGet(uri, accessToken);
+      JSONObject jsonObject = new JSONObject(response).getJSONObject("data");
+
+      RemoteApproval remoteApproval = new RemoteApproval();
+
+      JSONObject userJsonObject = jsonObject.getJSONObject("user");
+
+      remoteApproval.setId(jsonObject.getInt("id"));
+
+      remoteApproval.setUserName(userJsonObject.getString("username"));
+      remoteApproval.setTranslationId(jsonObject.getString("translationId"));
+      remoteApproval.setLanguageId(jsonObject.getString("translationId"));
+      remoteApproval.setStringId(jsonObject.getString("stringId"));
+      remoteApproval.setLanguageId(jsonObject.getString("languageId"));
+
+      return remoteApproval;
+    } catch (CrowdinConnectionException e) {
+      LOG.warn("Unable to retrieve approval for crowdin translation with id {}.", translationId, e);
+      return null;
+    }
+  }
+
 
   public void clearCache() {
     // implemented in cached storage

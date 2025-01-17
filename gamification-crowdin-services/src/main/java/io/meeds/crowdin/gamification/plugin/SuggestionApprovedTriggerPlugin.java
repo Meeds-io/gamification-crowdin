@@ -19,8 +19,9 @@
 package io.meeds.crowdin.gamification.plugin;
 
 import io.meeds.crowdin.gamification.model.Event;
+import io.meeds.crowdin.gamification.model.RemoteApproval;
 import io.meeds.crowdin.gamification.services.CrowdinTriggerService;
-import io.meeds.gamification.model.RealizationDTO;
+import io.meeds.crowdin.gamification.services.WebhookService;
 import io.meeds.gamification.service.RealizationService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,9 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
   @Autowired
   private RealizationService    realizationService;
 
+  @Autowired
+  private WebhookService        webhookService;
+
   @PostConstruct
   public void init() {
     crowdinTriggerService.addPlugin(this);
@@ -51,7 +55,7 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
     String objectId = constructObjectIdAsJsonString(payload, TRANSLATION);
 
     List<Event> eventList = new ArrayList<>();
-    eventList.add(new Event(APPROVE_SUGGESTION_EVENT_NAME,
+    eventList.add(new Event(SUGGESTION_APPROVED_EVENT_NAME,
                             extractSubItem(payload, TRANSLATION, USER, USERNAME),
                             extractSubItem(payload, TRANSLATION, USER, USERNAME),
                             objectId,
@@ -63,13 +67,14 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
                             trigger.equals(SUGGESTION_DISAPPROVED_TRIGGER),
                             countWords(extractSubItem(payload, TRANSLATION, STRING, TEXT))));
 
-    List<RealizationDTO> realizations = realizationService.findRealizationsByObjectIdAndObjectType(objectId, TRANSLATION);
+    // Retrieve who made that approval by calling Crowdin API
+    String translationId = extractSubItem(payload, TRANSLATION, ID);
+    RemoteApproval remoteApproval = webhookService.getApproval(getProjectId(payload), translationId);
 
-    if (!realizations.isEmpty()) {
-      String earnerId = realizations.get(0).getEarnerId();
-      eventList.add(new Event(SUGGESTION_APPROVED_EVENT_NAME,
-                              earnerId,
-                              earnerId,
+    if (remoteApproval != null) {
+      eventList.add(new Event(APPROVE_SUGGESTION_EVENT_NAME,
+                              remoteApproval.getUserName(),
+                              remoteApproval.getUserName(),
                               objectId,
                               TRANSLATION,
                               getProjectId(payload),
@@ -80,7 +85,6 @@ public class SuggestionApprovedTriggerPlugin extends CrowdinTriggerPlugin {
                               countWords(extractSubItem(payload, TRANSLATION, STRING, TEXT))));
 
     }
-
     return eventList;
   }
 

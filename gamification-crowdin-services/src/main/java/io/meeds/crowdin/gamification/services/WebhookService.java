@@ -18,6 +18,7 @@
  */
 package io.meeds.crowdin.gamification.services;
 
+import io.meeds.crowdin.gamification.model.RemoteApproval;
 import io.meeds.crowdin.gamification.model.RemoteDirectory;
 import io.meeds.crowdin.gamification.model.RemoteProject;
 import io.meeds.crowdin.gamification.model.WebHook;
@@ -56,10 +57,18 @@ public class WebhookService {
     return crowdinConsumerStorage.getProjects(accessToken);
   }
 
+  public RemoteApproval getApproval(String projectId, String translationId) {
+    WebHook webHook = webHookStorage.getWebhookByProjectId(Long.parseLong(projectId));
+    if (webHook != null) {
+      return crowdinConsumerStorage.getApproval(webHook.getToken(), projectId, translationId);
+    }
+    return null;
+  }
+
   public WebHook createWebhook(long projectId,
-                            String projectName,
-                            String accessToken,
-                            String currentUser) throws ObjectAlreadyExistsException, IllegalAccessException {
+                               String projectName,
+                               String accessToken,
+                               String currentUser) throws ObjectAlreadyExistsException, IllegalAccessException {
     if (!Utils.isRewardingManager(currentUser)) {
       throw new IllegalAccessException("The user is not authorized to create Crowdin hook");
     }
@@ -80,7 +89,7 @@ public class WebhookService {
   }
 
   public void updateWebHookAccessToken(long webHookId, String accessToken, String currentUser) throws IllegalAccessException,
-                                                                                               ObjectNotFoundException {
+          ObjectNotFoundException {
     if (!Utils.isRewardingManager(currentUser)) {
       throw new IllegalAccessException(AUTHORIZED_TO_ACCESS_CROWDIN_HOOKS);
     }
