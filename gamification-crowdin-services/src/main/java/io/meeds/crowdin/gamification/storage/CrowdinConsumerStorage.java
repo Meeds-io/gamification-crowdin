@@ -377,12 +377,21 @@ public class CrowdinConsumerStorage {
     }
   }
 
-  public RemoteApproval getApproval(String accessToken, String projectId, String translationId) {
+  public RemoteApproval getApproval(String accessToken, String projectId,String translationId) {
+
     try {
-      URI uri = URI.create(CROWDIN_API_URL + PROJECTS + projectId + APPROVALS + translationId);
+
+      URI uri = URI.create(CROWDIN_API_URL + PROJECTS + projectId + APPROVALS + "?translationId=" + translationId);
 
       String response = processGet(uri, accessToken);
-      JSONObject jsonObject = new JSONObject(response).getJSONObject("data");
+      JSONArray jsonArray = new JSONObject(response).getJSONArray("data");
+
+      if (jsonArray.isEmpty()) {
+        LOG.warn("Return empty approvals response for crowdin translation with id {}.", translationId);
+        return null;
+      }
+
+      JSONObject jsonObject = jsonArray.getJSONObject(0).getJSONObject("data");
 
       RemoteApproval remoteApproval = new RemoteApproval();
 
@@ -392,11 +401,12 @@ public class CrowdinConsumerStorage {
 
       remoteApproval.setUserName(userJsonObject.getString("username"));
       remoteApproval.setTranslationId(jsonObject.getString("translationId"));
-      remoteApproval.setLanguageId(jsonObject.getString("translationId"));
+      remoteApproval.setLanguageId(jsonObject.getString("languageId"));
       remoteApproval.setStringId(jsonObject.getString("stringId"));
       remoteApproval.setLanguageId(jsonObject.getString("languageId"));
 
       return remoteApproval;
+
     } catch (CrowdinConnectionException e) {
       LOG.warn("Unable to retrieve approval for crowdin translation with id {}.", translationId, e);
       return null;
