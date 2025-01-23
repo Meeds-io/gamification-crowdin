@@ -400,10 +400,6 @@ public class CrowdinConsumerStorage {
       remoteApproval.setId(jsonObject.getInt("id"));
 
       remoteApproval.setUserName(userJsonObject.getString("username"));
-      remoteApproval.setTranslationId(jsonObject.getString("translationId"));
-      remoteApproval.setLanguageId(jsonObject.getString("languageId"));
-      remoteApproval.setStringId(jsonObject.getString("stringId"));
-      remoteApproval.setLanguageId(jsonObject.getString("languageId"));
 
       return remoteApproval;
 

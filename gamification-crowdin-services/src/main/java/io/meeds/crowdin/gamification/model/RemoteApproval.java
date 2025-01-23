@@ -31,11 +31,4 @@ public class RemoteApproval implements Cloneable {
 
   private String               userName;
 
-  private String               translationId;
-
-  private String               stringId;
-
-  private String               languageId;
-
-
 }
