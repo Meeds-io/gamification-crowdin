@@ -18,6 +18,7 @@
  */
 package io.meeds.crowdin.gamification.plugin;
 
+import io.meeds.gamification.model.RealizationDTO;
 import io.meeds.gamification.plugin.EventPlugin;
 import io.meeds.gamification.service.EventService;
 import org.apache.commons.collections.CollectionUtils;
@@ -79,6 +80,12 @@ public class CrowdinEventPlugin extends EventPlugin {
         && (desiredMustBeHuman.equals("false") || desiredMustBeHuman.equals(triggerDetailsMop.get(MUST_BE_HUMAN)))
         && (CollectionUtils.isEmpty(desiredDirectoryIds) || desiredDirectoryIds.contains(triggerDetailsMop.get(DIRECTORY_ID)))
         && (CollectionUtils.isEmpty(desiredLanguageIds) || desiredLanguageIds.contains(triggerDetailsMop.get(LANGUAGE_ID)));
+  }
+
+  @Override
+  public String getLink(RealizationDTO realizationDTO) {
+    Map<String, Object> payloadMap = fromJsonStringToMap(realizationDTO.getObjectId());
+    return payloadMap.get("stringUrl") != null ? payloadMap.get("stringUrl").toString() : null;
   }
 
   private static Map<String, String> stringToMap(String mapAsString) {
