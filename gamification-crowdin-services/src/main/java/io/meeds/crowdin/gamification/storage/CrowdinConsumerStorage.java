@@ -18,11 +18,34 @@
  */
 package io.meeds.crowdin.gamification.storage;
 
-import io.meeds.crowdin.gamification.model.*;
-import org.apache.commons.httpclient.HttpStatus;
+import static io.meeds.crowdin.gamification.utils.Utils.APPROVALS;
+import static io.meeds.crowdin.gamification.utils.Utils.AUTHORIZATION;
+import static io.meeds.crowdin.gamification.utils.Utils.COMMENT_CREATED_TRIGGER;
+import static io.meeds.crowdin.gamification.utils.Utils.COMMENT_DELETED_TRIGGER;
+import static io.meeds.crowdin.gamification.utils.Utils.CROWDIN_API_URL;
+import static io.meeds.crowdin.gamification.utils.Utils.CROWDIN_CONNECTION_ERROR;
+import static io.meeds.crowdin.gamification.utils.Utils.CROWDIN_EVENTS;
+import static io.meeds.crowdin.gamification.utils.Utils.PROJECTS;
+import static io.meeds.crowdin.gamification.utils.Utils.TOKEN;
+import static io.meeds.crowdin.gamification.utils.Utils.WEBHOOKS;
+import static io.meeds.crowdin.gamification.utils.Utils.generateRandomSecret;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -35,25 +58,20 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HTTP;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.stereotype.Component;
+
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
 import io.meeds.crowdin.gamification.exception.CrowdinConnectionException;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.springframework.stereotype.Component;
-
-import javax.ws.rs.core.MediaType;
-
-import static io.meeds.crowdin.gamification.utils.Utils.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import io.meeds.crowdin.gamification.model.RemoteApproval;
+import io.meeds.crowdin.gamification.model.RemoteDirectory;
+import io.meeds.crowdin.gamification.model.RemoteLanguage;
+import io.meeds.crowdin.gamification.model.RemoteProject;
+import io.meeds.crowdin.gamification.model.WebHook;
 
 @Component
 public class CrowdinConsumerStorage {
