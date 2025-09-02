@@ -79,7 +79,7 @@ public class CrowdinTriggerService {
 
     Object eventsObj = payloadMap.get("events");
     List<Map<String, Object>> eventsListMap = (List<Map<String, Object>>) eventsObj;
-    LOG.info("Total Events: " + eventsListMap.size());
+    LOG.debug("Total Events: " + eventsListMap.size());
 
     for (Map<String, Object> eventMap : eventsListMap) {
       String trigger = extractSubItem(eventMap, "event");
@@ -125,13 +125,13 @@ public class CrowdinTriggerService {
     } else {
       senderId = receiverId;
     }
-    LOG.info("processEvent: senderId: " + senderId);
+    LOG.debug("processEvent: senderId: " + senderId);
     if (StringUtils.isNotBlank(senderId)) {
       if (NumberUtils.isDigits(senderId)) {
         broadcastCrowdinEvent(event, senderId, receiverId);
       } else {
         Identity socialIdentity = identityManager.getOrCreateUserIdentity(senderId);
-        LOG.info("processEvent: socialIdentity: " + socialIdentity);
+        LOG.debug("processEvent: socialIdentity: " + socialIdentity);
         if (socialIdentity != null) {
           broadcastCrowdinEvent(event, senderId, receiverId);
         }
@@ -153,10 +153,10 @@ public class CrowdinTriggerService {
       gam.put("ruleTitle", event.getName());
       if (!event.isCancelling()) {
         listenerService.broadcast(GAMIFICATION_GENERIC_EVENT, gam, "");
-        LOG.info("Crowdin action {} broadcast for user {}", event.getName(), senderId);
+        LOG.debug("Crowdin action {} broadcast for user {}", event.getName(), senderId);
       } else {
         listenerService.broadcast(GAMIFICATION_CANCEL_EVENT, gam, "");
-        LOG.info("Crowdin cancelling action {} broadcast for user {}", event.getName(), senderId);
+        LOG.debug("Crowdin cancelling action {} broadcast for user {}", event.getName(), senderId);
       }
 
     } catch (Exception e) {
