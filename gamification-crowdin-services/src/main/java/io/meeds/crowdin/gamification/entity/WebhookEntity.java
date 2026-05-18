@@ -22,9 +22,16 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import jakarta.persistence.*;
-import lombok.Data;
 import org.exoplatform.commons.utils.StringListConverter;
+
+import io.meeds.common.persistence.PortableSequence;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Data;
 
 @Entity(name = "CrowdinWebhooks")
 @Table(name = "CROWDIN_WEBHOOKS")
@@ -34,8 +41,7 @@ public class WebhookEntity implements Serializable {
   private static final long serialVersionUID = 2607146513663056421L;
 
   @Id
-  @SequenceGenerator(name = "SEQ_CROWDIN_WEBHOOKS_ID", sequenceName = "SEQ_CROWDIN_WEBHOOKS_ID", allocationSize = 1)
-  @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_CROWDIN_WEBHOOKS_ID")
+  @PortableSequence(name = "SEQ_CROWDIN_WEBHOOKS_ID")
   @Column(name = "ID")
   private Long              id;
 
