@@ -92,6 +92,8 @@ public class Utils {
 
   public static final String   TRANSLATION                        = "translation";
 
+  public static final String   APPROVAL                           = "approval";
+
   public static final String   SUGGESTION_ADDED_TRIGGER           = "suggestion.added";
 
   public static final String   SUGGESTION_DELETED_TRIGGER         = "suggestion.deleted";
